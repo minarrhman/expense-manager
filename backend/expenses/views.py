@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.permissions import isAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
 from .models import Category, Transaction
@@ -8,9 +8,9 @@ from .serializers import CategorySerializer, TransactionSerializer
 
 # Create your views here.
 
-class CategoryListCreateView(generics.ListCreateView):
-    serialzerclass = CategorySerializer
-    permission_classes = [isAuthenticated]
+class CategoryListCreateView(generics.ListCreateAPIView):
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -21,9 +21,9 @@ class CategoryListCreateView(generics.ListCreateView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class TransactionListCreateView(generics.ListCreateView):
-    serializer = TransactionSerializer
-    permission_classes = [isAuthenticated]
+class TransactionListCreateView(generics.ListCreateAPIView):
+    serializer_class = TransactionSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Transaction.objects.filter(

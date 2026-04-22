@@ -11,9 +11,11 @@ class Category(models.Model):
 
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
+    #allowing user to create categories as per their preference
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
+        #shows category name
         return self.name
 
 class Transaction(models.Model):
@@ -31,6 +33,7 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self,*args,**kwargs):
+        #checks the transaction type matches the selected category or not 
         if self.category.type != self.type:
             raise ValueError("Transaction type and category must match")
         super().save(*args,**kwargs)
