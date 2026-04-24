@@ -3,6 +3,16 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    date_of_birth = models.DateField(null=True,blank=True)
+    profile_photo = models.ImageField(upload_to='profiles/', null = True, blank=True)
+    monthly_budget = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
+
+    def __str__(self):
+        return f"{  self.user.name}'s profile"
+
+
 class Category(models.Model):
     TYPE_CHOICES =(
         ('income','Income'),
@@ -17,6 +27,15 @@ class Category(models.Model):
     def __str__(self):
         #shows category name
         return self.name
+
+class CategoryLimit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category= models.ForeignKey(Category, on_delete=models.CASCADE)
+    limit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.category} limit"
+
 
 class Transaction(models.Model):
     TYPE_CHOICES = (
