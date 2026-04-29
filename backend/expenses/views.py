@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
+from django.db.models import Q, Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Category, Transaction
@@ -44,3 +44,44 @@ class TransactionListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         
+class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # getting the user from the jwt token
+        user = request.user
+
+        #getting all user transaction
+        transaction = Transaction.objects.filter(user=user)
+
+        #total income 
+        total_income = transaction.filter(type='income').aggregate(total=Sum('amount'))['total'] or 0
+
+        # total expense 
+        total_expense = transaction.filter(type='expense').aaggregate(total=Sum('amount'))['total'] or 0
+
+        # balance 
+        balance = total_income - total_expense
+
+        category_expense = (
+            transaction
+            .filter(type='expense')
+            .values('category__name')
+            .annotate(total=Sum('amount'))
+        )
+
+        recent_transactions = transaction.order_by('-date')[:5]
+
+        #serializing the recent data in JSON
+
+        from .serializers import TransactionSerializer
+        
+        recent_data = TransactionSerializer(recent_transactions, many=True).data
+
+        return Response({
+            'total_income':total_income,
+            'total_expense':total_expense,
+            'balance':balance,
+            'category_expense': list(category_expense),
+            'recent_transactions':recent_data
+        })
