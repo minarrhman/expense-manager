@@ -5,8 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Category, Transaction
+from .models import Category, Transaction, CategoryLimit
 from .serializers import CategorySerializer, TransactionSerializer, RegisterSerializer
+from .utils.date_range import get_date_range
 
 # Create your views here.
 
@@ -48,20 +49,24 @@ class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+
         # getting the user from the jwt token
         user = request.user
 
+        start, end = get_date_range(request)
         #getting all user transaction
-        transaction = Transaction.objects.filter(user=user)
+        transaction = Transaction.objects.filter(user=user, date__range=[start, end])
 
         #total income 
         total_income = transaction.filter(type='income').aggregate(total=Sum('amount'))['total'] or 0
 
         # total expense 
-        total_expense = transaction.filter(type='expense').aaggregate(total=Sum('amount'))['total'] or 0
+        total_expense = transaction.filter(type='expense').aggregate(total=Sum('amount'))['total'] or 0
 
         # balance 
         balance = total_income - total_expense
+
+
 
         category_expense = (
             transaction
@@ -70,6 +75,8 @@ class DashboardView(APIView):
             .annotate(total=Sum('amount'))
         )
 
+
+        #getting last five transaction
         recent_transactions = transaction.order_by('-date')[:5]
 
         #serializing the recent data in JSON
@@ -78,10 +85,39 @@ class DashboardView(APIView):
         
         recent_data = TransactionSerializer(recent_transactions, many=True).data
 
+
+        #setting monthly budget feature and warnings 
+
+        profile = user.profile
+        monthly_budget = profile.monthly_budget or 0
+
+        remaining_budget = monthly_budget - total_expense
+
+        limits = CategoryLimit.objects.filter(user=user)
+        category_warnings = []
+
+        for limit in limits:
+            spent = transaction.filter(
+                type='expense',
+                category=limit.category
+            ).aggregate(total=Sum('amount'))['total'] or 0
+
+            if spent>limit.limit:
+                category_warnings.append({
+                    'category':limit.category_name,
+                    'limit':limit.limit,
+                    'spent':spent,
+                    'exceeded_by': spent - limit.limit
+                })
+
+
         return Response({
+            'start_date':start,
+            'end_date':end,
             'total_income':total_income,
             'total_expense':total_expense,
             'balance':balance,
             'category_expense': list(category_expense),
-            'recent_transactions':recent_data
+            'recent_transactions':recent_data,
+            'category_warnings':category_warnings
         })
