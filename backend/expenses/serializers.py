@@ -74,7 +74,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'type']
 
 class CategoryLimitSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name')
+    category_name = serializers.CharField(source='category.name', read_only=True)
     class Meta:
         fields = [
             'id',
