@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Category, Transaction, CategoryLimit
-from .serializers import CategorySerializer, TransactionSerializer, RegisterSerializer
+from .models import Category, Transaction, CategoryLimit, Profile
+from .serializers import CategorySerializer, TransactionSerializer, RegisterSerializer, ProfileSerializer, CategoryLimitSerializer
 from .utils.date_range import get_date_range
 
 # Create your views here.
@@ -19,6 +19,14 @@ class RegisterView(APIView):
             user = serializer.save()
             return Response({"message":"User is created successfully"}, status=201)
         return Response(serializer.errors, status=400)
+
+
+class ProfileView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        return self.request.user.profile
     
 
 class CategoryListCreateView(generics.ListCreateAPIView):
@@ -33,6 +41,21 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         )
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+class CategoryLimitView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CategoryLimitSerializer
+
+    def get_queryset(self):
+        return CategoryLimit.objects.filter(user=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(user= self.request.user)
+
+class CategoryLimitDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CategoryLimitSerializer
+
+    def get_queryset(self):
+        return CategoryLimit.objects.filter(user=self.request.user)
 
 class TransactionListCreateView(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer
