@@ -12,7 +12,7 @@ class Profile(models.Model):
     monthly_budget = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
     def __str__(self):
-        return f"{  self.user.name}'s profile"
+        return f"{  self.user.first_name}'s profile"
 
 
 class Category(models.Model):
