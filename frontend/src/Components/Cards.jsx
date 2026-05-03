@@ -6,7 +6,7 @@ function Card({title, amount, change}) {
                 <span className="text-green-500 text-sm">{change}</span>
 
             </div>
-            <h2 className="text-2xl font-bold mt-2">{amount}</h2>
+            <h2 className="text-2xl font-bold mt-2">৳{amount}</h2>
         </div>
     );
 }
