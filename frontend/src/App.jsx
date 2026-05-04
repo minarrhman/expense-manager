@@ -1,7 +1,26 @@
+import { useState, useEffect } from "react";
+import API from "./services/api";
 import Card from "./Components/Cards";
 import Navbar from "./Components/Navbar";
 
 function App() {
+  const [data, setData] = useState(null);
+
+  useEffect(()=>{
+    fetchDashboard();
+
+  },[]);
+  const fetchDashboard = async () => {
+    try{
+      const res = await API.get("api/dashboard/");
+      setData(res.data);
+    }catch(err){
+      console.error(err);
+    }
+  };
+
+  if (!data) return <div>Loading...</div>;
+
   return (
     
     <div className="flex">
@@ -13,23 +32,14 @@ function App() {
             Welcome Back, Minar!
           </h1>
 
-          <div className="grid grid-cols-4 gap-4">
-            <Card
-            title='Total Balance'
-            amount="12000"
-            change="+12"/>
-            <Card
-            title='Monthly Income'
-            amount="15000"
-            change="+16"/>
-            <Card
-            title='Total Balance'
-            amount="7000"
-            change="+11"/>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card title="Balance" amount={`$${data.balance}`} />
+            <Card title="Income" amount={`$${data.total_income}`} />
+            <Card title="Expenses" amount={`$${data.total_expense}`} />
             <Card
             title='Saving Goals'
             amount="2000"
-            change="+62"/>
+            change="+62%"/>
           </div>
         </div>
       </div>
