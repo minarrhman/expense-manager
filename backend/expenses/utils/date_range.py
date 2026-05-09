@@ -6,6 +6,7 @@ def get_date_range(request):
 
     today = now().date()
 
+    date = request.query_params.get('date')
     days = request.query_params.get('days')
     start_date = request.query_params.get('start')
     end_date = request.query_params.get('end')
@@ -16,7 +17,7 @@ def get_date_range(request):
         end = today
         return start, end
     
-    elif start_date or end_date:
+    elif start_date and end_date:
         start = datetime.strptime(start_date,"%Y-%m-%d").date()
         end = datetime.strptime(end_date,"%Y-%m-%d").date()
         return start, end

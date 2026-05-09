@@ -93,7 +93,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         category = data.get('category')
         type_ = data.get('type')
 
-        if category != type_:
+        if category.type != type_:
             raise serializers.ValidationError(
                 "Transaction type and category do not match"
             )

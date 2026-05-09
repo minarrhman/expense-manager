@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from .models import Category, Transaction, CategoryLimit, Profile
 from .serializers import CategorySerializer, TransactionSerializer, RegisterSerializer, ProfileSerializer, CategoryLimitSerializer
 from .utils.date_range import get_date_range
+from .pagination import TransactionPagination
 
 # Create your views here.
 
@@ -60,11 +61,28 @@ class CategoryLimitDetailView(generics.RetrieveUpdateDestroyAPIView):
 class TransactionListCreateView(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer
     permission_classes = [IsAuthenticated]
-
+    pagination_class = TransactionPagination
     def get_queryset(self):
-        return Transaction.objects.filter(
-            user=self.request.user
-        ).order_by('-date')
+        start, end = get_date_range(self.request)
+
+        queryset = Transaction.objects.filter(
+            user=self.request.user,
+            date__range=[start, end]
+        ).order_by('-date', '-id')
+
+        search = self.request.query_params.get("search")
+        transaction_type = self.request.query_params.get("type")
+
+        if search:
+            queryset = queryset.filter(
+                Q(description__icontains=search) |
+                Q(category__name__icontains=search)
+            )
+
+        if transaction_type and transaction_type != 'all':
+            queryset = queryset.filter(type=transaction_type)
+
+        return queryset
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         
@@ -78,7 +96,7 @@ class DashboardView(APIView):
 
         start, end = get_date_range(request)
         #getting all user transaction
-        transaction = Transaction.objects.filter(user=user, date__range=[start, end])
+        transaction = Transaction.objects.filter(user=user, date__range=[start,end])
 
         #total income 
         total_income = transaction.filter(type='income').aggregate(total=Sum('amount'))['total'] or 0
@@ -100,7 +118,7 @@ class DashboardView(APIView):
 
 
         #getting last five transaction
-        recent_transactions = transaction.order_by('-date')[:5]
+        recent_transactions = transaction.order_by('-date','-id')[:5]
 
         #serializing the recent data in JSON
 
@@ -127,7 +145,7 @@ class DashboardView(APIView):
 
             if spent>limit.limit:
                 category_warnings.append({
-                    'category':limit.category_name,
+                    'category':limit.category.name,
                     'limit':limit.limit,
                     'spent':spent,
                     'exceeded_by': spent - limit.limit
@@ -142,5 +160,5 @@ class DashboardView(APIView):
             'balance':balance,
             'category_expense': list(category_expense),
             'recent_transactions':recent_data,
-            'category_warnings':category_warnings
+            'category_warnings':category_warnings,
         })

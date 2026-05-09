@@ -1,30 +1,48 @@
-function Navbar(){
-    const active = "Dashboard";
+import { NavLink } from "react-router-dom";
 
-    const menu = [
-        'Dashboard',
-        'Transactions',
-        'Budget',
-        'Reports',
-        'Settings'
-    ];
-    return(
-        <div className = "w-64 h-screen bg-gray-900 text-white p-5 flex flex-col">
-            <h1 className="text-xl font-bold mb-8">Expense Bucket</h1>
+function Navbar() {
+
+    const menu = {
+        Dashboard: "/",
+        Transactions: "/transactions",
+        Budget: "/budget",
+        Reports: "/reports",
+        Settings: "/settings",
+    };
+
+    return (
+        <div className="w-64 h-screen bg-gray-900 text-white p-5 flex flex-col">
+
+            <h1 className="text-xl font-bold mb-8">
+                Expense Bucket
+            </h1>
+
             <ul className="space-y-4">
+
                 {
-                    menu.map((item) => (
-                        <li key={item}
-                            className= {`p-2 rounded cursor-pointer ${
-                                 active === item ? "bg-gray-700 text-green-500 text-bold":"hover:bg-gray-800"}`}>
-                                    {item}
-                        </li>
+                    Object.entries(menu).map(([item, link]) => (
+
+                        <NavLink
+                            key={item}
+                            to={link}
+                            className={({ isActive }) =>
+                                `block p-2 rounded transition ${
+                                    isActive
+                                        ? "bg-gray-700 text-green-500 font-bold"
+                                        : "hover:bg-gray-800"
+                                }`
+                            }
+                        >
+                            {item}
+                        </NavLink>
+
                     ))
                 }
 
             </ul>
+
         </div>
-    )
+    );
 }
 
-export default Navbar; 
+export default Navbar;
