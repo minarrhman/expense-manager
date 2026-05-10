@@ -8,9 +8,12 @@ import Navbar from "./Components/Navbar"
 
 function App(){
   return (  
-    <div className="flex">
-      <Navbar/>
-  
+    <div className="flex bg-gray-100 min-h-screen">
+      <div className="sticky top-0 h-screen">
+        <Navbar/>
+      </div>
+      
+     <main className="flex-1 p-6 overflow-y-auto">
       <Routes>
         <Route path="/" element={<Dashboard/>} />
         <Route path="/transactions" element={<Transactions/>} />
@@ -18,7 +21,7 @@ function App(){
         <Route path="/reports" element={<Reports/>} />
         <Route path="/reports" element={<Settings/>} />
       </Routes>
-
+    </main>
     </div>
     )
 

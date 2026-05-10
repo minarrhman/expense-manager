@@ -3,6 +3,7 @@ from rest_framework import generics, status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, Sum
+from django.db.models.functions import TruncMonth
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Category, Transaction, CategoryLimit, Profile
@@ -57,6 +58,73 @@ class CategoryLimitDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return CategoryLimit.objects.filter(user=self.request.user)
+
+
+
+class ReportSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        user = request.user
+        start,end = get_date_range(request)
+
+
+        transactions = Transaction.objects.filter(user=user, date__range=[start,end])
+        print(transactions)
+
+        income = transactions.filter(
+            type="income").aggregate(total=Sum("amount"))["total"] or 0
+
+        expense = transactions.filter(
+            type="expense").aggregate(total=Sum("amount"))["total"] or 0
+
+        balance = income - expense
+
+        return Response(
+            {
+            "income":income,
+            "expense":expense,
+            "balance":balance
+            })
+
+class CategoryBreakdownView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        expenses = (
+            Transaction.objects.filter(
+                    user=request.user,
+                    type= "expense"
+                    ).values("category").annotate(total=Sum("amount")).order_by("-total")
+        )
+        return Response(expenses)
+
+
+class MonthlyTrendView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        monthly_data = (
+            Transaction.objects.filter(
+                user=request.user
+                ).annotate(month=TruncMonth("date")).values("month", "type").annotate(total=Sum("amount")).order_by("month")
+            )
+        formatted = {}
+
+        for item in monthly_data:
+            month = item["month"].strftime("%b %Y")
+
+        if month not in formatted:
+            formatted[month] = {
+            "month":month,
+            "income": 0,
+            "expense": 0
+            }
+        formatted[month][item["type"]] = item["total"]
+
+        return Response(list(formatted.values()))
 
 class TransactionListCreateView(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer

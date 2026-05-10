@@ -20,7 +20,6 @@ function Transactions() {
   const fetchTransactions = async () => {
     try{
        const res = await API.get(`api/transactions/?page=${page}&search=${search}&type=${filter}`);
-      console.log(res.data.results);
       setData(res.data);
     }catch(err){
       console.error(err.response?.data);

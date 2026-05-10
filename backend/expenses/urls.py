@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import CategoryListCreateView, TransactionListCreateView, RegisterView,CategoryLimitDetailView,CategoryLimitView, DashboardView,ProfileView
+from .views import (CategoryListCreateView, TransactionListCreateView, RegisterView,
+    CategoryLimitDetailView,CategoryLimitView,
+    DashboardView,ProfileView, ReportSummaryView,
+    CategoryBreakdownView, MonthlyTrendView)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 #defining urls
@@ -14,4 +17,7 @@ urlpatterns = [
     path('category-limit/<int:pk>/', CategoryLimitDetailView.as_view()),
     path('transactions/', TransactionListCreateView.as_view()),
     path('dashboard/', DashboardView.as_view()),
+    path('reports/summary/', ReportSummaryView.as_view()), 
+    path('reports/category-breakdown/', CategoryBreakdownView.as_view()),
+    path('reports/monthly-trend/',MonthlyTrendView.as_view())
 ]
