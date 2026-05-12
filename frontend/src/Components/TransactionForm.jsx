@@ -54,7 +54,7 @@ function TransactionForm({ onAdd }) {
     const fetchCategories = async () => {
       try {
         const res = await API.get('api/categories/');
-        setCategories(res.data);
+        setCategories(res.data.results  );
       }catch(err){
         console.log(err.response.data)
       }

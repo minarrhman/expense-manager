@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.utils.timezone import now
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum,F
 from django.db.models.functions import TruncMonth
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -70,7 +71,6 @@ class ReportSummaryView(APIView):
 
 
         transactions = Transaction.objects.filter(user=user, date__range=[start,end])
-        print(transactions)
 
         income = transactions.filter(
             type="income").aggregate(total=Sum("amount"))["total"] or 0
@@ -92,11 +92,14 @@ class CategoryBreakdownView(APIView):
 
     def get(self, request):
 
+        today = now()
         expenses = (
             Transaction.objects.filter(
                     user=request.user,
+                    date__year=today.year,
+                    date__month=today.month,
                     type= "expense"
-                    ).values("category").annotate(total=Sum("amount")).order_by("-total")
+                    ).values(category_name=F("category__name")).annotate(total=Sum("amount")).order_by("-total")
         )
         return Response(expenses)
 
@@ -116,13 +119,14 @@ class MonthlyTrendView(APIView):
         for item in monthly_data:
             month = item["month"].strftime("%b %Y")
 
-        if month not in formatted:
-            formatted[month] = {
-            "month":month,
-            "income": 0,
-            "expense": 0
-            }
-        formatted[month][item["type"]] = item["total"]
+            if month not in formatted:
+                formatted[month] = {
+                "month":month,
+                "income": 0,
+                "expense": 0
+                }
+            formatted[month][item["type"]] = float(item["total"])
+
 
         return Response(list(formatted.values()))
 

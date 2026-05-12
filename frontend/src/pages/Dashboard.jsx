@@ -32,7 +32,7 @@ function Dashboard() {
       <div className="flex-1 bg-gray-100 min-h-screen p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold mb-6">
-            Welcome Back, Minar!
+            Welcome Back!
             </h1>
 
             <button onClick={()=> setShowModal(true)}

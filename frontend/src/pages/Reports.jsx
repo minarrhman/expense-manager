@@ -37,11 +37,9 @@ function Reports() {
           API.get("api/reports/monthly-trend/")
         ]
       )
-      
       setSummary(summaryRes.data);
       setCategoryData(categoryRes.data);
       setTrendData(trendyRes.data);
-      console.log(categoryData)
     }catch(err){
       console.error(err);
     }finally{
@@ -152,20 +150,21 @@ function Reports() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border p-6">
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-1">
             Expense Breakdown
           </h2>
+          <p className='text-sm text-gray-500'>Curent Month</p>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+            <PieChart margin={{top:30, right:30, left:30 }}>
               <Pie
                 data={categoryData}
                 dataKey="total"
-                nameKey="category"
+                nameKey="category_name"
                 cx="50%"
                 cy="50%"
-                outerRadius={110}
+                outerRadius={90}
                 label={(entry) =>
-                  `${entry.payload.category} ${(entry.percent * 100).toFixed(0)}%`
+                  `${entry.payload.category_name} ${(entry.percent * 100).toFixed(0)}%`
                   }>
                 
                 {categoryData.map((entry, index) => (
