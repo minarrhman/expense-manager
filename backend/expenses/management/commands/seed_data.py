@@ -27,11 +27,11 @@ class Command(BaseCommand):
 
         # 👤 Create user
         user = User.objects.create_user(
-            username="depto",
+            username="depta",
             password="123456",
             first_name="Depto",
             last_name="Chowddhury",
-            email="depto@example.com"
+            email="depta@example.com"
         )
 
         # Ensure profile

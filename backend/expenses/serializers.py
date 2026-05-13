@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Category, Transaction, Profile, CategoryLimit
+from .models import Category, Transaction, Profile, CategoryLimit, SavingsModel
 from django.db.models import Sum 
 from django.utils.timezone import now
 from decimal import Decimal
@@ -81,7 +81,7 @@ class CategoryLimitSerializer(serializers.ModelSerializer):
 
     spent = serializers.SerializerMethodField()
     remaining = serializers.SerializerMethodField()
-    percentage_used = serializers.SerializerMethodField
+    percentage_used = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()    
     class Meta:
         model = CategoryLimit
@@ -157,6 +157,26 @@ class CategoryLimitSerializer(serializers.ModelSerializer):
             return "warning"
         return "safe"
     
+class SavingsGoalSerializer(serializers.ModelSerializer):
+    progress_percentage = serializers.ReadOnlyField()
+    current_amount = serializers.ReadOnlyField()
+    remaining_amount = serializers.ReadOnlyField()
+
+    class Meta:
+        model = SavingsModel
+        fields = [
+            'id',
+            'title',
+            'target_amount',
+            'current_amount',
+            'start_date',
+            'target_date',
+            'progress_percentage',
+            'remaining_amount',
+        ]
+
+    def get_remaining_amount(self, obj):
+        return obj.target_amount - obj.current_amount
 
 class TransactionSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)

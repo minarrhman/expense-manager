@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -45,8 +46,7 @@ class SavingsModel(models.Model):
     description = models.CharField(max_length=250)
 
     target_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    current_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
+    
     start_date = models.DateField(auto_now_add=True)
     target_date = models.DateField()
 
@@ -59,16 +59,30 @@ class SavingsModel(models.Model):
         return min(
             (self.current_amount/self.target_amount)*100,
         100)
+    @property
+    def current_amount(self):
+        
+        total = Transaction.objects.filter(
+            user=self.user,
+            type='savings',
+            savings_goal=self
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        return total
+    @property
+    def remaining_amount(self):
+        return self.target_amount - self.current_amount
     
 
 class Transaction(models.Model):
     TYPE_CHOICES = (
         ('income','Income'),
         ('expense','Expense'),
+        ('savings', 'Savings')
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    savings_goal = models.ForeignKey(SavingsModel,on_delete=models.SET_NULL,null=True, blank= True,related_name='transactions')
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date = models.DateField()
@@ -79,8 +93,9 @@ class Transaction(models.Model):
         #checks the transaction type matches the selected category or not 
         if self.category.type != self.type:
             raise ValueError("Transaction type and category must match")
+    
         super().save(*args,**kwargs)
-
+        
     def __str__(self):
         return f"{self.user} - {self.amount} - {self.type}" 
 

@@ -7,8 +7,10 @@ from django.db.models import Q, Sum,F
 from django.db.models.functions import TruncMonth
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Category, Transaction, CategoryLimit, Profile
-from .serializers import CategorySerializer, TransactionSerializer, RegisterSerializer, ProfileSerializer, CategoryLimitSerializer
+from .models import Category, Transaction, CategoryLimit, Profile, SavingsModel
+from .serializers import (CategorySerializer, TransactionSerializer,
+                           RegisterSerializer,SavingsGoalSerializer,
+                           ProfileSerializer, CategoryLimitSerializer)
 from .utils.date_range import get_date_range
 from .pagination import TransactionPagination
 
@@ -60,7 +62,21 @@ class CategoryLimitDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return CategoryLimit.objects.filter(user=self.request.user)
 
+class SavingsGoalView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SavingsGoalSerializer
 
+    def get_queryset(self):
+        return SavingsModel.objects.filter(user=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class SavingsGoalDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SavingsGoalSerializer
+
+    def get_queryset(self):
+        return SavingsModel.objects.filter(user=self.request.user)
 
 class ReportSummaryView(APIView):
     permission_classes = [IsAuthenticated]
@@ -157,7 +173,14 @@ class TransactionListCreateView(generics.ListCreateAPIView):
         return queryset
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        
+
+
+class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TransactionSerializer
+
+    def get_queryset(self):
+        return Transaction.objects.filter(user=self.request.user)
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
