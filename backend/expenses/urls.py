@@ -17,7 +17,7 @@ urlpatterns = [
     path('category-limits/',CategoryLimitView.as_view()),
     path('category-limits/<int:pk>/', CategoryLimitDetailView.as_view()),
     path('savings-goal/',SavingsGoalView.as_view()),
-    path('savings-goal/<int:pk>/'),
+    path('savings-goal/<int:pk>/',SavingsGoalDetailView.as_view()),
     path('transactions/', TransactionListCreateView.as_view()),
     path('transactions/<int:pk>/', TransactionDetailView.as_view()),
     path('dashboard/', DashboardView.as_view()),

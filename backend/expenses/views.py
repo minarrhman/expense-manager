@@ -26,7 +26,7 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=400)
 
 
-class ProfileView(generics.RetrieveAPIView):
+class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
 
@@ -81,43 +81,61 @@ class SavingsGoalDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ReportSummaryView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self,request):
+    def get(self, request):
         user = request.user
-        start,end = get_date_range(request)
+        start, end = get_date_range(request)
 
-
-        transactions = Transaction.objects.filter(user=user, date__range=[start,end])
+        transactions = Transaction.objects.filter(
+            user=user,
+            date__range=[start, end]
+        )
 
         income = transactions.filter(
-            type="income").aggregate(total=Sum("amount"))["total"] or 0
+            type="income"
+        ).aggregate(total=Sum("amount"))["total"] or 0
 
         expense = transactions.filter(
-            type="expense").aggregate(total=Sum("amount"))["total"] or 0
+            type="expense"
+        ).aggregate(total=Sum("amount"))["total"] or 0
 
         balance = income - expense
 
-        return Response(
-            {
-            "income":income,
-            "expense":expense,
-            "balance":balance
-            })
+        return Response({
+            "income": float(income),
+            "expense": float(expense),
+            "balance": float(balance)
+        })
 
 class CategoryBreakdownView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        start, end = get_date_range(request)
 
-        today = now()
         expenses = (
             Transaction.objects.filter(
-                    user=request.user,
-                    date__year=today.year,
-                    date__month=today.month,
-                    type= "expense"
-                    ).values(category_name=F("category__name")).annotate(total=Sum("amount")).order_by("-total")
+                user=request.user,
+                date__range=[start, end],
+                type="expense"
+            )
+            .values(
+                "category__id",
+                category_name=F("category__name")
+            )
+            .annotate(total=Sum("amount"))
+            .order_by("-total")
         )
-        return Response(expenses)
+
+        data = []
+
+        for expense in expenses:
+            data.append({
+                "category_id": expense["category__id"],
+                "category_name": expense["category_name"],
+                "total": float(expense["total"])
+            })
+
+        return Response(data)
 
 
 class MonthlyTrendView(APIView):
@@ -127,22 +145,29 @@ class MonthlyTrendView(APIView):
 
         monthly_data = (
             Transaction.objects.filter(
-                user=request.user
-                ).annotate(month=TruncMonth("date")).values("month", "type").annotate(total=Sum("amount")).order_by("month")
+                user=request.user,
             )
+            .annotate(month=TruncMonth("date"))
+            .values("month", "type")
+            .annotate(total=Sum("amount"))
+            .order_by("month")
+        )
+
         formatted = {}
 
         for item in monthly_data:
-            month = item["month"].strftime("%b %Y")
+            month_key = item["month"].strftime("%Y-%m")
+            label = item["month"].strftime("%b")
 
-            if month not in formatted:
-                formatted[month] = {
-                "month":month,
-                "income": 0,
-                "expense": 0
+            if month_key not in formatted:
+                formatted[month_key] = {
+                    "month": month_key,
+                    "label": label,
+                    "income": 0,
+                    "expense": 0,
                 }
-            formatted[month][item["type"]] = float(item["total"])
 
+            formatted[month_key][item["type"]] = float(item["total"])
 
         return Response(list(formatted.values()))
 
@@ -183,7 +208,36 @@ class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Transaction.objects.filter(user=self.request.user)
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
+    def generate_ai_insight(self, income, expense, warnings):
 
+        savings_rate = ((income - expense) / income * 100) if income else 0
+
+        if expense > income:
+            return {
+                "type": "danger",
+                "title": "Overspending Alert",
+                "message": "You are spending more than you earn this month."
+            }
+
+        if savings_rate < 20:
+            return {
+                "type": "warning",
+                "title": "Low Savings Rate",
+                "message": f"You are saving only {int(savings_rate)}% of your income."
+            }
+
+        if len(warnings) > 0:
+            return {
+                "type": "warning",
+                "title": "Budget Attention Needed",
+                "message": "Some categories are close to or over limit."
+            }
+
+        return {
+            "type": "success",
+            "title": "Great Job!",
+            "message": "Your spending habits look healthy this month."
+        }
     def get(self, request):
 
         # getting the user from the jwt token
@@ -245,11 +299,14 @@ class DashboardView(APIView):
                     'spent':spent,
                     'exceeded_by': spent - limit.limit
                 })
-
-
+        
+        ai_insight = self.generate_ai_insight(total_income, total_expense, category_warnings)
+        
         return Response({
+            'name':user.first_name,
             'start_date':start,
             'end_date':end,
+            "ai_insight":ai_insight,
             'total_income':total_income,
             'total_expense':total_expense,
             'balance':balance,

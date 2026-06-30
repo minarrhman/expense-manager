@@ -4,6 +4,7 @@ from .models import Category, Transaction, Profile, CategoryLimit, SavingsModel
 from django.db.models import Sum 
 from django.utils.timezone import now
 from decimal import Decimal
+from datetime import date
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -21,6 +22,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password':{'write_only':True}
         }
+    def validate_date_of_birth(self, value):
+        today = date.today()
+        
+        age = (
+            today.year
+            - value.year
+            - ((today.month, today.day) < (value.month, value.day))
+        )
+
+        if age<15:
+            raise serializers.ValidationError(
+                "You must be at least 15 to create an account."
+            )
+        return value    
+
     def create(self, validated_data):
         date_of_birth = validated_data.pop('date_of_birth',None)
 
@@ -46,7 +62,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields=[
+        fields = [
             'username',
             'email',
             'first_name',
@@ -55,18 +71,32 @@ class ProfileSerializer(serializers.ModelSerializer):
             'monthly_budget',
             'profile_photo'
         ]
+
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user',{})
+        user_data = validated_data.pop("user", {})
 
         user = instance.user
-        user.first_name = user.data.get('first_name', user.first_name)
-        user.last_name = user.data.get('last_name',user.last_name)
-        user.email = user.data.get('email', user.email)
+
+        user.first_name = user_data.get("first_name", user.first_name)
+        user.last_name = user_data.get("last_name", user.last_name)
+        user.email = user_data.get("email", user.email)
         user.save()
 
-        instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
-        instance.monthly_budget = validated_data.get('monthly_budget', instance.monthly_budget)
-        instance.profile_photo = validated_data.get('profile_photo', instance.profile_photo)
+        instance.date_of_birth = validated_data.get(
+            "date_of_birth",
+            instance.date_of_birth,
+        )
+
+        instance.monthly_budget = validated_data.get(
+            "monthly_budget",
+            instance.monthly_budget,
+        )
+
+        instance.profile_photo = validated_data.get(
+            "profile_photo",
+            instance.profile_photo,
+        )
+
         instance.save()
 
         return instance

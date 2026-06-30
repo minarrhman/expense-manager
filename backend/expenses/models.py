@@ -9,7 +9,7 @@ from django.dispatch import receiver
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_of_birth = models.DateField(null=True,blank=True)
-    profile_photo = models.ImageField(upload_to='profiles/', null = True, blank=True)
+    profile_photo = models.TextField(null=True, blank=True)
     monthly_budget = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
     def __str__(self):

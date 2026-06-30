@@ -29,8 +29,8 @@ class Command(BaseCommand):
         user = User.objects.create_user(
             username="depta",
             password="123456",
-            first_name="Depto",
-            last_name="Chowddhury",
+            first_name="Depta",
+            last_name="Chowdhury",
             email="depta@example.com"
         )
 
@@ -46,6 +46,7 @@ class Command(BaseCommand):
             ("Entertainment", "expense"),
             ("Shopping", "expense"),
             ("Bills", "expense"),
+            ("Others",'expense'),
             ("Salary", "income"),
             ("Freelance", "income"),
         ]
@@ -61,9 +62,9 @@ class Command(BaseCommand):
             categories[name] = cat
 
         # 🎯 Category limits
-        CategoryLimit.objects.create(user=user, category=categories["Food"], limit=6000)
-        CategoryLimit.objects.create(user=user, category=categories["Transport"], limit=3000)
-        CategoryLimit.objects.create(user=user, category=categories["Entertainment"], limit=2500)
+        CategoryLimit.objects.create(user=user, category=categories["Food"], limit=10000)
+        CategoryLimit.objects.create(user=user, category=categories["Transport"], limit=4000)
+        CategoryLimit.objects.create(user=user, category=categories["Entertainment"], limit=3500)
 
         # 📅 Generate 6 months data
         start_date = datetime.now() - timedelta(days=180)
@@ -77,7 +78,7 @@ class Command(BaseCommand):
             if date.day == 1:
                 Transaction.objects.create(
                     user=user,
-                    amount=random.randint(15000, 25000),
+                    amount=random.randint(20000, 25000),
                     type="income",
                     category=categories["Salary"],
                     date=date,
@@ -88,7 +89,7 @@ class Command(BaseCommand):
             if date.day == 15:
                 Transaction.objects.create(
                     user=user,
-                    amount=random.randint(3000, 10000),
+                    amount=random.randint(5000, 20000),
                     type="income",
                     category=categories["Freelance"],
                     date=date,
@@ -96,10 +97,10 @@ class Command(BaseCommand):
                 )
 
             # 💸 Daily expenses
-            for _ in range(random.randint(1, 3)):
+            for _ in range(random.randint(0, 2)):
                 Transaction.objects.create(
                     user=user,
-                    amount=random.randint(100, 2000),
+                    amount=random.randint(100, 1200),
                     type="expense",
                     category=random.choice([
                         categories["Food"],
