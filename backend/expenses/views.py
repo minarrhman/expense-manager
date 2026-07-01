@@ -16,7 +16,26 @@ from .serializers import (CategorySerializer, TransactionSerializer,
 from .utils.date_range import get_date_range
 from .pagination import TransactionPagination
 
+from django.http import JsonResponse
+from .management.commands import seed_categories, seed_data
+
+
+
 # Create your views here.
+def run_seed_categories(request):
+    try:
+        seed_categories()
+        return JsonResponse({"message": "Categories seeded"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
+    
+def run_seed_data(request):
+    try:
+        seed_data()
+        return JsonResponse({"message": "Data seeded"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
+
 
 class RegisterView(APIView):
     def post(self, request):

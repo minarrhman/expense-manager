@@ -4,6 +4,7 @@ from .views import (CategoryListView, TransactionListCreateView, RegisterView,
     DashboardView,ProfileView, ReportSummaryView,
     CategoryBreakdownView, MonthlyTrendView,TransactionDetailView,
     SavingsGoalDetailView,SavingsGoalView)
+from .views import run_seed_categories, run_seed_data
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 #defining urls
@@ -23,5 +24,7 @@ urlpatterns = [
     path('dashboard/', DashboardView.as_view()),
     path('reports/summary/', ReportSummaryView.as_view()), 
     path('reports/category-breakdown/', CategoryBreakdownView.as_view()),
-    path('reports/monthly-trend/',MonthlyTrendView.as_view())
+    path('reports/monthly-trend/',MonthlyTrendView.as_view()),
+    path("seed/categories/", run_seed_categories),
+    path("seed/data/", run_seed_data),
 ]
