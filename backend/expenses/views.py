@@ -83,11 +83,9 @@ class ReportSummaryView(APIView):
 
     def get(self, request):
         user = request.user
-        start, end = get_date_range(request)
 
         transactions = Transaction.objects.filter(
             user=user,
-            date__range=[start, end]
         )
 
         income = transactions.filter(
@@ -243,18 +241,22 @@ class DashboardView(APIView):
         # getting the user from the jwt token
         user = request.user
 
+        income = (Transaction.objects.filter(user=user)).filter(type='income').aggregate(total=Sum('amount'))['total'] or 0
+        expense = (Transaction.objects.filter(user=user)).filter(type='expense').aggregate(total=Sum('amount'))['total'] or 0
+        balance = income - expense
+
+
+
         start, end = get_date_range(request)
         #getting all user transaction
         transaction = Transaction.objects.filter(user=user, date__range=[start,end])
 
         #total income 
-        total_income = transaction.filter(type='income').aggregate(total=Sum('amount'))['total'] or 0
+        current_month_income = transaction.filter(type='income').aggregate(total=Sum('amount'))['total'] or 0
 
         # total expense 
-        total_expense = transaction.filter(type='expense').aggregate(total=Sum('amount'))['total'] or 0
+        current_month_expemse = transaction.filter(type='expense').aggregate(total=Sum('amount'))['total'] or 0
 
-        # balance 
-        balance = total_income - total_expense
 
 
 
@@ -281,7 +283,7 @@ class DashboardView(APIView):
         profile = user.profile
         monthly_budget = profile.monthly_budget or 0
 
-        remaining_budget = monthly_budget - total_expense
+        remaining_budget = monthly_budget - current_month_expemse
 
         limits = CategoryLimit.objects.filter(user=user)
         category_warnings = []
@@ -300,15 +302,15 @@ class DashboardView(APIView):
                     'exceeded_by': spent - limit.limit
                 })
         
-        ai_insight = self.generate_ai_insight(total_income, total_expense, category_warnings)
+        ai_insight = self.generate_ai_insight(current_month_income, current_month_expemse, category_warnings)
         
         return Response({
             'name':user.first_name,
             'start_date':start,
             'end_date':end,
             "ai_insight":ai_insight,
-            'total_income':total_income,
-            'total_expense':total_expense,
+            'total_income':current_month_income,
+            'total_expense':current_month_expemse,
             'balance':balance,
             'category_expense': list(category_expense),
             'recent_transactions':recent_data,
