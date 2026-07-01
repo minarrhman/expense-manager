@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
     View,
+    ScrollView,
     TextInput,
     Text,
     TouchableOpacity,
@@ -45,7 +46,7 @@ export default function TransactionFormScreen({ route, navigation }) {
     const fetchCategories = async () => {
         try {
             const data = await getCategories();
-            setCategories(data.results);
+            setCategories(data);
         }
         catch (error) {
             console.log(error);
@@ -85,7 +86,7 @@ export default function TransactionFormScreen({ route, navigation }) {
             type,
             category: selectedCategory,
             description,
-            date: date.toISOString().split("T")[0],
+            date: date.toLocaleDateString("en-CA") 
         };
 
         try {
@@ -118,7 +119,7 @@ export default function TransactionFormScreen({ route, navigation }) {
     };
 
     return (
-        <View
+        <ScrollView
             style={[
                 styles.container,
                 {
@@ -344,7 +345,7 @@ export default function TransactionFormScreen({ route, navigation }) {
                 </Text>
             </TouchableOpacity>
 
-        </View>
+        </ScrollView>
     );
 };
     const styles = StyleSheet.create({

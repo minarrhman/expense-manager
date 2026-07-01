@@ -1,20 +1,76 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+} from "react-native";
+
+import { useTheme } from "../theme/ThemeProvider";
 
 const SummaryCards = ({ income, expense }) => {
+    const { colors } = useTheme();
+
     return (
         <View style={styles.container}>
 
             {/* Income Card */}
-            <View style={[styles.card, styles.incomeCard]}>
-                <Text style={styles.label}>💵 Income</Text>
-                <Text style={styles.amount}>৳ {income}</Text>
+            <View
+                style={[
+                    styles.card,
+                    styles.incomeCard,
+                    {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                    },
+                ]}
+            >
+                <Text
+                    style={[
+                        styles.label,
+                        { color: colors.secondaryText },
+                    ]}
+                >
+                    💵 Income
+                </Text>
+
+                <Text
+                    style={[
+                        styles.amount,
+                        { color: "#16A34A" },
+                    ]}
+                >
+                    ৳ {Number(income || 0).toLocaleString()}
+                </Text>
             </View>
 
             {/* Expense Card */}
-            <View style={[styles.card, styles.expenseCard]}>
-                <Text style={styles.label}>🔻 Expense</Text>
-                <Text style={styles.amount}>৳ {expense}</Text>
+            <View
+                style={[
+                    styles.card,
+                    styles.expenseCard,
+                    {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                    },
+                ]}
+            >
+                <Text
+                    style={[
+                        styles.label,
+                        { color: colors.secondaryText },
+                    ]}
+                >
+                    🔻 Expense
+                </Text>
+
+                <Text
+                    style={[
+                        styles.amount,
+                        { color: "#DC2626" },
+                    ]}
+                >
+                    ৳ {Number(expense || 0).toLocaleString()}
+                </Text>
             </View>
 
         </View>
@@ -35,25 +91,22 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 14,
         marginHorizontal: 5,
-        backgroundColor: "#fff",
-
-        // soft fintech shadow
+        borderWidth: 1,
         elevation: 3,
     },
 
     incomeCard: {
         borderLeftWidth: 4,
-        borderLeftColor: "#2ecc71",
+        borderLeftColor: "#16A34A",
     },
 
     expenseCard: {
         borderLeftWidth: 4,
-        borderLeftColor: "#e74c3c",
+        borderLeftColor: "#DC2626",
     },
 
     label: {
         fontSize: 13,
-        color: "#777",
         marginBottom: 5,
     },
 

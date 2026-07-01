@@ -1,7 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useTheme } from "../theme/ThemeProvider";
 
 const BudgetWarningCard = ({ warnings }) => {
+    const { colors } = useTheme();
 
     const getStatus = (item) => {
         if (item.spent > item.limit) return "danger";
@@ -12,17 +14,25 @@ const BudgetWarningCard = ({ warnings }) => {
     const getColor = (status) => {
         switch (status) {
             case "danger":
-                return "#e74c3c";
+                return "#EF4444";
             case "warning":
-                return "#f39c12";
+                return "#F59E0B";
             default:
-                return "#2ecc71";
+                return "#22C55E";
         }
     };
 
     if (!warnings || warnings.length === 0) {
         return (
-            <View style={styles.card}>
+            <View
+                style={[
+                    styles.card,
+                    {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                    },
+                ]}
+            >
                 <Text style={styles.safeText}>
                     ✅ All categories are within limit
                 </Text>
@@ -31,9 +41,21 @@ const BudgetWarningCard = ({ warnings }) => {
     }
 
     return (
-        <View style={styles.card}>
-
-            <Text style={styles.header}>
+        <View
+            style={[
+                styles.card,
+                {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                },
+            ]}
+        >
+            <Text
+                style={[
+                    styles.header,
+                    { color: colors.text },
+                ]}
+            >
                 ⚠ Budget Alerts
             </Text>
 
@@ -43,15 +65,19 @@ const BudgetWarningCard = ({ warnings }) => {
 
                 return (
                     <View key={index} style={styles.row}>
-                        <Text style={[styles.text, { color }]}>
+                        <Text
+                            style={[
+                                styles.text,
+                                { color },
+                            ]}
+                        >
                             {status === "danger"
-                                ? `🔴 ${item.category} exceeded by ৳${item.exceeded_by}`
+                                ? `🔴 ${item.category} exceeded by ৳${Number(item.exceeded_by).toLocaleString()}`
                                 : `🟡 ${item.category} near limit`}
                         </Text>
                     </View>
                 );
             })}
-
         </View>
     );
 };
@@ -60,10 +86,18 @@ export default BudgetWarningCard;
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: "#fff",
         padding: 15,
         borderRadius: 14,
         marginBottom: 15,
+        borderWidth: 1,
+
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 5,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
         elevation: 3,
     },
 
@@ -71,7 +105,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "bold",
         marginBottom: 10,
-        color: "#333",
     },
 
     row: {
@@ -80,10 +113,11 @@ const styles = StyleSheet.create({
 
     text: {
         fontSize: 14,
+        fontWeight: "500",
     },
 
     safeText: {
-        color: "#2ecc71",
+        color: "#22C55E",
         fontSize: 14,
         fontWeight: "bold",
     },

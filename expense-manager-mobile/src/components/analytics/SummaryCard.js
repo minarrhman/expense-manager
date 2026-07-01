@@ -16,8 +16,8 @@ export default function SummaryCard({
             style={[
                 styles.card,
                 {
-                    backgroundColor:
-                        backgroundColor || colors.cardBackground,
+                    backgroundColor: backgroundColor || colors.card,
+                    borderColor: colors.border,
                 },
                 fullWidth && styles.fullWidth,
             ]}
@@ -32,7 +32,7 @@ export default function SummaryCard({
             <Text
                 style={[
                     styles.title,
-                    { color: colors.textSecondary },
+                    { color: colors.secondaryText },
                 ]}
             >
                 {title}
@@ -55,17 +55,8 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 18,
         width: "48%",
-
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.08,
-        shadowRadius: 5,
-        elevation: 3,
+        borderWidth: 1,
     },
-
     accent: {
         height: 5,
         width: 45,

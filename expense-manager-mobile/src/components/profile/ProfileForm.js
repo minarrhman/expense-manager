@@ -114,23 +114,13 @@ export default function ProfileForm({
                         value={profile?.date_of_birth}
                         onChange={(date) => {
                             const formattedDate =
-                                date.toISOString().split("T")[0];
+                                new Date().toLocaleDateString("en-CA")
 
                             updateField(
                                 "date_of_birth",
                                 formattedDate
                             );
                         }}
-                    />
-
-                    <ProfileInput
-                        label="Monthly Budget"
-                        value={profile?.monthly_budget?.toString() || ""}
-                        placeholder="Enter monthly budget"
-                        keyboardType="numeric"
-                        onChangeText={(text) =>
-                            updateField("monthly_budget", text)
-                        }
                     />
                 </>
 
@@ -231,30 +221,6 @@ export default function ProfileForm({
                             ]}
                         >
                             {profile?.date_of_birth || "Not Set"}
-                        </Text>
-                    </View>
-
-                    <View style={styles.infoItem}>
-                        <Text
-                            style={[
-                                styles.label,
-                                {
-                                    color: colors.secondaryText,
-                                },
-                            ]}
-                        >
-                            Monthly Budget
-                        </Text>
-
-                        <Text
-                            style={[
-                                styles.value,
-                                {
-                                    color: colors.text,
-                                },
-                            ]}
-                        >
-                            ৳ {profile?.monthly_budget || "0"}
                         </Text>
                     </View>
 

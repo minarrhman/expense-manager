@@ -68,7 +68,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'date_of_birth',
-            'monthly_budget',
             'profile_photo'
         ]
 
@@ -87,10 +86,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.date_of_birth,
         )
 
-        instance.monthly_budget = validated_data.get(
-            "monthly_budget",
-            instance.monthly_budget,
-        )
 
         instance.profile_photo = validated_data.get(
             "profile_photo",

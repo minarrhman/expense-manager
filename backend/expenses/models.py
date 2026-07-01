@@ -10,25 +10,21 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_of_birth = models.DateField(null=True,blank=True)
     profile_photo = models.TextField(null=True, blank=True)
-    monthly_budget = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True)
 
     def __str__(self):
         return f"{  self.user.first_name}'s profile"
 
 
 class Category(models.Model):
-    TYPE_CHOICES =(
-        ('income','Income'),
-        ('expense','Expense'),
+    TYPE_CHOICES = (
+        ("income", "Income"),
+        ("expense", "Expense"),
     )
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
-    #allowing user to create categories as per their preference
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        #shows category name
         return self.name
 
 class CategoryLimit(models.Model):

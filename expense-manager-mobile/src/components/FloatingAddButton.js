@@ -1,9 +1,27 @@
 import React from "react";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import {
+    TouchableOpacity,
+    Text,
+    StyleSheet,
+} from "react-native";
+
+import { useTheme } from "../theme/ThemeProvider";
 
 export default function FloatingAddButton({ onPress }) {
+    const { colors } = useTheme();
+
     return (
-        <TouchableOpacity style={styles.button} onPress={onPress}>
+        <TouchableOpacity
+            style={[
+                styles.button,
+                {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.card,
+                },
+            ]}
+            onPress={onPress}
+            activeOpacity={0.85}
+        >
             <Text style={styles.text}>+</Text>
         </TouchableOpacity>
     );
@@ -14,20 +32,30 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 70,
         right: 20,
-        width: 50,
-        height: 50,
-        borderRadius: 30,
-        backgroundColor: "#4f46e5",
+
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+
         justifyContent: "center",
         alignItems: "center",
-        elevation: 5,
+
+        borderWidth: 2,
+
         shadowColor: "#000",
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
+        shadowOpacity: 0.25,
+        shadowRadius: 6,
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        elevation: 6,
     },
+
     text: {
-        color: "#fff",
-        fontSize: 28,
+        color: "#FFF",
+        fontSize: 30,
         fontWeight: "bold",
+        marginTop: -2,
     },
 });

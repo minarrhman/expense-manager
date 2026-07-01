@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import SearchBar from "../components/SearchBar";
 import FilterTabs from "../components/FilterTabs";
 import TransactionCardDetailed from "../components/TransactionCardDetailed";
+import DateRangeFilterModal from "../components/DateRangeFilterModal";
 
 import {
     getTransactions,
@@ -22,6 +23,8 @@ export default function TransactionsScreen({ navigation }) {
 
     const [transactions, setTransactions] = useState([]);
     const [search, setSearch] = useState("");
+    const [dateRange, setDateRange] = useState("this_month");
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const [filter, setFilter] = useState("all");
     const [refreshing, setRefreshing] = useState(false);
     const [page, setPage] = useState(1);
@@ -35,7 +38,7 @@ export default function TransactionsScreen({ navigation }) {
             setPage(1);
             setHasMore(true);
             fetchTransactions(1, false);
-        }, [search, filter])
+        }, [search, filter, dateRange])
     );
 
     const fetchTransactions = async (
@@ -43,14 +46,22 @@ export default function TransactionsScreen({ navigation }) {
         isLoadMore = false
     ) => {
         try {
+
             const data = await getTransactions(
                 pageNumber,
                 search,
-                filter
+                filter,
+                dateRange
             );
 
+            // Stop if backend says page doesn't exist
+            if (!data.results) {
+                setHasMore(false);
+                return;
+            }
+
             if (isLoadMore) {
-                setTransactions((prev) => [
+                setTransactions(prev => [
                     ...prev,
                     ...data.results,
                 ]);
@@ -58,11 +69,7 @@ export default function TransactionsScreen({ navigation }) {
                 setTransactions(data.results);
             }
 
-            if (!data.next) {
-                setHasMore(false);
-            } else {
-                setHasMore(true);
-            }
+            setHasMore(!!data.next);
 
         } catch (error) {
             console.log(error);
@@ -87,9 +94,22 @@ export default function TransactionsScreen({ navigation }) {
 
         setRefreshing(true);
 
-        await fetchTransactions();
+        setPage(1);
+        setHasMore(true);
+
+        await fetchTransactions(1, false);
 
         setRefreshing(false);
+
+    };
+
+    const applyDateRange = (range) => {
+
+        setDateRange(range);
+        setShowFilterModal(false);
+
+        setPage(1);
+        setHasMore(true);
 
     };
 
@@ -99,8 +119,8 @@ export default function TransactionsScreen({ navigation }) {
 
             await deleteTransaction(id);
 
-            setTransactions((prev) =>
-                prev.filter((item) => item.id !== id)
+            setTransactions(prev =>
+                prev.filter(item => item.id !== id)
             );
 
         } catch (error) {
@@ -156,6 +176,7 @@ export default function TransactionsScreen({ navigation }) {
             <SearchBar
                 value={search}
                 onChange={setSearch}
+                onFilterPress={() => setShowFilterModal(true)}  // ✅ only real connection
             />
 
             <FilterTabs
@@ -181,7 +202,13 @@ export default function TransactionsScreen({ navigation }) {
                 }}
                 showsVerticalScrollIndicator={false}
             />
-
+            <DateRangeFilterModal
+                visible={showFilterModal}
+                onClose={() => setShowFilterModal(false)}
+                onSelect={applyDateRange}
+                selectedRange={dateRange}
+                colors={colors}
+            />
         </View>
     );
 }

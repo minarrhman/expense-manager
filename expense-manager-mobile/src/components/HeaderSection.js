@@ -1,7 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useTheme } from "../theme/ThemeProvider";
 
 const HeaderSection = ({ username }) => {
+    const { colors } = useTheme();
 
     const hour = new Date().getHours();
 
@@ -19,11 +21,25 @@ const HeaderSection = ({ username }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.nameText}>
+            <Text
+                style={[
+                    styles.nameText,
+                    {
+                        color: colors.text,
+                    },
+                ]}
+            >
                 Hello, {username} 👋
             </Text>
 
-            <Text style={styles.greetingText}>
+            <Text
+                style={[
+                    styles.greetingText,
+                    {
+                        color: colors.secondaryText,
+                    },
+                ]}
+            >
                 {greeting}
             </Text>
         </View>
@@ -45,7 +61,6 @@ const styles = StyleSheet.create({
 
     greetingText: {
         fontSize: 16,
-        color: "#7A7A7A",
         marginTop: 4,
     },
 });

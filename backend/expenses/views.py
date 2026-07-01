@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.utils import timezone
+from datetime import date, timedelta
 from rest_framework import generics, status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.utils.timezone import now
@@ -34,18 +36,14 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user.profile
     
 
-class CategoryListCreateView(generics.ListCreateAPIView):
+class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None   # <- Disable pagination
 
     def get_queryset(self):
-        user = self.request.user
+        return Category.objects.all().order_by("type", "name")
 
-        return Category.objects.filter(
-            Q(user=user) | Q(user__isnull=True)
-        )
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 class CategoryLimitView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CategoryLimitSerializer
@@ -173,30 +171,75 @@ class TransactionListCreateView(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = TransactionPagination
+
     def get_queryset(self):
-        start, end = get_date_range(self.request)
+        today = timezone.localdate()
+
+        range_filter = self.request.query_params.get(
+            "range",
+            "this_month",
+        )
+
+        start = None
+        end = None
+
+        # ---------- Date Filters ----------
+
+        if range_filter == "this_month":
+            start = today.replace(day=1)
+            end = today
+
+        elif range_filter == "last_month":
+            first_day_this_month = today.replace(day=1)
+            end = first_day_this_month - timedelta(days=1)
+            start = end.replace(day=1)
+
+        elif range_filter == "3m":
+            start = today - timedelta(days=90)
+            end = today
+
+        elif range_filter == "6m":
+            start = today - timedelta(days=180)
+            end = today
+
+        elif range_filter == "year":
+            start = today.replace(month=1, day=1)
+            end = today
+
+        elif range_filter == "custom":
+            start = self.request.query_params.get("start")
+            end = self.request.query_params.get("end")
 
         queryset = Transaction.objects.filter(
-            user=self.request.user,
-            date__range=[start, end]
-        ).order_by('-date', '-id')
+            user=self.request.user
+        )
+
+        if start and end:
+            queryset = queryset.filter(
+                date__range=[start, end]
+            )
+
+        # ---------- Search ----------
 
         search = self.request.query_params.get("search")
-        transaction_type = self.request.query_params.get("type")
 
         if search:
             queryset = queryset.filter(
-                Q(description__icontains=search) |
-                Q(category__name__icontains=search)
+                Q(description__icontains=search)
+                | Q(category__name__icontains=search)
             )
 
-        if transaction_type and transaction_type != 'all':
+        # ---------- Type Filter ----------
+
+        transaction_type = self.request.query_params.get("type")
+
+        if transaction_type and transaction_type != "all":
             queryset = queryset.filter(type=transaction_type)
 
-        return queryset
+        return queryset.order_by("-date", "-id")
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
 class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
@@ -281,9 +324,7 @@ class DashboardView(APIView):
         #setting monthly budget feature and warnings 
 
         profile = user.profile
-        monthly_budget = profile.monthly_budget or 0
 
-        remaining_budget = monthly_budget - current_month_expemse
 
         limits = CategoryLimit.objects.filter(user=user)
         category_warnings = []

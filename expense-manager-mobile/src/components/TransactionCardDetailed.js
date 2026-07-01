@@ -1,32 +1,62 @@
-import React from 'react';
+import React from "react";
 import {
     View,
     Text,
     StyleSheet,
-    TouchableOpacity
-} from 'react-native';
+    TouchableOpacity,
+} from "react-native";
 
-export default function TransactionCardDetailed({transaction, onPress}) {
+import { useTheme } from "../theme/ThemeProvider";
+
+export default function TransactionCardDetailed({
+    transaction,
+    onPress,
+}) {
+    const { colors } = useTheme();
 
     return (
-
-        <TouchableOpacity style={styles.card}
-        onPress={()=>onPress(transaction)}>
-
+        <TouchableOpacity
+            style={[
+                styles.card,
+                {
+                    backgroundColor: colors.card,
+                },
+            ]}
+            onPress={() => onPress(transaction)}
+        >
             <View>
-
-                <Text style={styles.category}>
+                <Text
+                    style={[
+                        styles.category,
+                        {
+                            color: colors.text,
+                        },
+                    ]}
+                >
                     {transaction.category_name}
                 </Text>
 
-                <Text style={styles.description}>
+                <Text
+                    style={[
+                        styles.description,
+                        {
+                            color: colors.secondaryText,
+                        },
+                    ]}
+                >
                     {transaction.description}
                 </Text>
 
-                <Text style={styles.date}>
+                <Text
+                    style={[
+                        styles.date,
+                        {
+                            color: colors.textMuted,
+                        },
+                    ]}
+                >
                     {transaction.date}
                 </Text>
-
             </View>
 
             <Text
@@ -34,53 +64,45 @@ export default function TransactionCardDetailed({transaction, onPress}) {
                     styles.amount,
                     {
                         color:
-                        transaction.type==="income"
-                        ? "green"
-                        : "red"
-                    }
+                            transaction.type === "income"
+                                ? "#22C55E"
+                                : "#EF4444",
+                    },
                 ]}
             >
-
-                {transaction.type==="income" ? "+" : "-"}৳
-                {transaction.amount}
-
+                {transaction.type === "income" ? "+" : "-"}৳
+                {Number(transaction.amount).toLocaleString()}
             </Text>
-
         </TouchableOpacity>
-
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-
-    card:{
-        backgroundColor:'#fff',
-        borderRadius:15,
-        padding:15,
-        flexDirection:'row',
-        justifyContent:'space-between',
-        marginBottom:12
+    card: {
+        borderRadius: 15,
+        padding: 15,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 12,
     },
 
-    category:{
-        fontSize:16,
-        fontWeight:'600'
+    category: {
+        fontSize: 16,
+        fontWeight: "600",
     },
 
-    description:{
-        color:'#666',
-        marginTop:4
+    description: {
+        marginTop: 4,
     },
 
-    date:{
-        marginTop:8,
-        color:'#999',
-        fontSize:12
+    date: {
+        marginTop: 8,
+        fontSize: 12,
     },
 
-    amount:{
-        fontSize:17,
-        fontWeight:'bold'
-    }
-
-})
+    amount: {
+        fontSize: 17,
+        fontWeight: "bold",
+        alignSelf: "center",
+    },
+});

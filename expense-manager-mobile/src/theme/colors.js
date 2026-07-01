@@ -4,6 +4,7 @@ export const lightColors = {
 
     text: "#111827",
     secondaryText: "#6B7280",
+    textMuted: "#9CA3AF",
 
     border: "#E5E7EB",
 
@@ -19,7 +20,8 @@ export const darkColors = {
     card: "#1F2937",
 
     text: "#F9FAFB",
-    secondaryText: "#9CA3AF",
+    secondaryText: "#ffffff",   // brighter than before
+    textMuted: "#9CA3AF",
 
     border: "#374151",
 

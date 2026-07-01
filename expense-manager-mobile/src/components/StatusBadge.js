@@ -1,7 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+} from "react-native";
+
+import { useTheme } from "../theme/ThemeProvider";
 
 const StatusBadge = ({ status }) => {
+    const { colors } = useTheme();
 
     const config = {
         safe: {
@@ -21,13 +28,16 @@ const StatusBadge = ({ status }) => {
         },
     };
 
-    const current = config[status];
+    const current = config[status] || config.safe;
 
     return (
         <View
             style={[
                 styles.badge,
-                { backgroundColor: current.background },
+                {
+                    backgroundColor: current.background,
+                    borderColor: colors.border,
+                },
             ]}
         >
             <Text
@@ -49,6 +59,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 20,
+        borderWidth: 1,
     },
 
     text: {

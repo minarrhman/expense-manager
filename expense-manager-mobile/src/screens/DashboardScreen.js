@@ -119,6 +119,7 @@ const DashboardScreen = ({ navigation }) => {
 
             <RecentTransactionsCard
                 transactions={data?.recent_transactions || []}
+                onPress={()=> navigation.navigate('Transactions')}
             />
 
         </ScrollView>

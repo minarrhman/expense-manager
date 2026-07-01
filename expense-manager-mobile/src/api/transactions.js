@@ -5,31 +5,49 @@ const BASE_URL = "http://192.168.0.163:8000/api";
 export const getTransactions = async (
     page = 1,
     search = "",
-    type = 'all'
+    type = "all",
+    range = "this_month",
+    start = null,
+    end = null
 ) => {
     const token = await getToken();
 
     let url = `${BASE_URL}/transactions/?page=${page}`;
 
+    // search
     if (search) {
-        url += `&search=${encodeURIComponent(search)}`
+        url += `&search=${encodeURIComponent(search)}`;
     }
-    if (type!='all'){
-        url += `&type=${type}`
+
+    // type filter
+    if (type !== "all") {
+        url += `&type=${type}`;
     }
+
+    // date range
+    if (range) {
+        url += `&range=${range}`;
+    }
+
+    // custom range support
+    if (range === "custom" && start && end) {
+        url += `&start=${start}&end=${end}`;
+    }
+
     const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
             Authorization: `Bearer ${token}`,
         },
-    })
+    });
+
     const data = await response.json();
 
-    if (response === 401){
+    if (response === 401) {
         await removeToken();
         throw new Error("Unauthorized.")
     }
-    if (!response.ok){
+    if (!response.ok) {
         throw data;
     }
 
@@ -38,7 +56,7 @@ export const getTransactions = async (
 };
 
 
-export const getTransaction = async(id) => {
+export const getTransaction = async (id) => {
     const token = await getToken();
 
     const response = await fetch(`${BASE_URL}/transactions/${id}`,
@@ -51,11 +69,11 @@ export const getTransaction = async(id) => {
     )
     const data = await response.json()
 
-    if (response === 401){
+    if (response === 401) {
         await removeToken();
         throw new Error("Unauthorized.")
     }
-    if (!response.ok){
+    if (!response.ok) {
         throw data;
     }
 
@@ -64,22 +82,22 @@ export const getTransaction = async(id) => {
 };
 
 
-export const deleteTransaction = async(id) => {
+export const deleteTransaction = async (id) => {
 
     const token = await getToken();
 
-    const response = await fetch(`${BASE_URL}/transactions/${id}/`,{
+    const response = await fetch(`${BASE_URL}/transactions/${id}/`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token}`,
         },
     })
 
-    if(response === 401){
+    if (response === 401) {
         await removeToken();
         throw new Error("Unauthorized")
     }
-    if(!response.ok){
+    if (!response.ok) {
         throw new Error("Failed to delete transaction");
     }
 
@@ -87,10 +105,10 @@ export const deleteTransaction = async(id) => {
 
 };
 
-export const updateTransaction = async(id, transactionData) => {
+export const updateTransaction = async (id, transactionData) => {
     const token = await getToken();
 
-    const response = await fetch(`${BASE_URL}/transactions/${id}/`,{
+    const response = await fetch(`${BASE_URL}/transactions/${id}/`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -101,22 +119,22 @@ export const updateTransaction = async(id, transactionData) => {
 
     const data = await response.json();
 
-    if (response === 401){
+    if (response === 401) {
         await removeToken();
         throw new Error("Unauthorized.")
     }
-    if (!response.ok){
+    if (!response.ok) {
         throw data;
     }
 
     return data;
 };
 
-export const createTransaction = async(transactionData)=>{
+export const createTransaction = async (transactionData) => {
 
     const token = await getToken();
 
-    const response = await fetch(`${BASE_URL}/transactions/`,{
+    const response = await fetch(`${BASE_URL}/transactions/`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -127,11 +145,11 @@ export const createTransaction = async(transactionData)=>{
 
     const data = await response.json();
 
-    if (response === 401){
+    if (response === 401) {
         await removeToken();
         throw new Error("Unauthorized.")
     }
-    if (!response.ok){
+    if (!response.ok) {
         throw data;
     }
 

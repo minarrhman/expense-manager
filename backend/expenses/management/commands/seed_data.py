@@ -10,107 +10,136 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        from django.contrib.auth.models import User
-        from expenses.models import Category, Transaction, CategoryLimit, Profile
-        from datetime import datetime, timedelta
-        import random
-
         self.stdout.write("⚠️ Clearing old data...")
 
-        # 🔥 DELETE OLD DATA (order matters)
         Transaction.objects.all().delete()
         CategoryLimit.objects.all().delete()
-        Category.objects.all().delete()
         User.objects.exclude(is_superuser=True).delete()
 
-        self.stdout.write("✅ Old data cleared")
+        self.stdout.write(self.style.SUCCESS("✅ Old data cleared"))
 
-        # 👤 Create user
+        # Create demo user
         user = User.objects.create_user(
             username="depta",
             password="123456",
             first_name="Depta",
             last_name="Chowdhury",
-            email="depta@example.com"
+            email="depta@example.com",
         )
 
-        # Ensure profile
         Profile.objects.get_or_create(user=user)
-        user.profile.monthly_budget = 20000
-        user.profile.save()
 
-        # 📊 Create categories
-        categories_data = [
-            ("Food", "expense"),
-            ("Transport", "expense"),
-            ("Entertainment", "expense"),
-            ("Shopping", "expense"),
-            ("Bills", "expense"),
-            ("Others",'expense'),
-            ("Salary", "income"),
-            ("Freelance", "income"),
+        # -----------------------------
+        # Load predefined categories
+        # -----------------------------
+        categories = {
+            category.name: category
+            for category in Category.objects.all()
+        }
+
+        required_categories = [
+            "Salary",
+            "Freelance",
+            "Food",
+            "Transport",
+            "Entertainment",
+            "Shopping",
+            "Bills",
         ]
 
-        categories = {}
+        missing = [
+            name for name in required_categories
+            if name not in categories
+        ]
 
-        for name, ctype in categories_data:
-            cat = Category.objects.create(
-                name=name,
-                type=ctype,
-                user=None
+        if missing:
+            self.stdout.write(
+                self.style.ERROR(
+                    f"Missing categories: {', '.join(missing)}"
+                )
             )
-            categories[name] = cat
+            self.stdout.write(
+                self.style.WARNING(
+                    "Run: python manage.py seed_categories"
+                )
+            )
+            return
 
-        # 🎯 Category limits
-        CategoryLimit.objects.create(user=user, category=categories["Food"], limit=10000)
-        CategoryLimit.objects.create(user=user, category=categories["Transport"], limit=4000)
-        CategoryLimit.objects.create(user=user, category=categories["Entertainment"], limit=3500)
+        # -----------------------------
+        # Budget Limits
+        # -----------------------------
+        CategoryLimit.objects.create(
+            user=user,
+            category=categories["Food"],
+            limit=10000,
+        )
 
-        # 📅 Generate 6 months data
+        CategoryLimit.objects.create(
+            user=user,
+            category=categories["Transport"],
+            limit=4000,
+        )
+
+        CategoryLimit.objects.create(
+            user=user,
+            category=categories["Entertainment"],
+            limit=3500,
+        )
+
+        # -----------------------------
+        # Generate 6 months of data
+        # -----------------------------
         start_date = datetime.now() - timedelta(days=180)
 
         self.stdout.write("📊 Generating transactions...")
 
         for i in range(180):
+
             date = start_date + timedelta(days=i)
 
-            # 💰 Salary on 1st
+            # Monthly Salary
             if date.day == 1:
                 Transaction.objects.create(
                     user=user,
-                    amount=random.randint(20000, 25000),
+                    amount=random.randint(25000, 35000),
                     type="income",
                     category=categories["Salary"],
                     date=date,
-                    description="Monthly Salary"
+                    description="Monthly Salary",
                 )
 
-            # 💻 Freelance mid-month
+            # Freelancing
             if date.day == 15:
                 Transaction.objects.create(
                     user=user,
-                    amount=random.randint(5000, 20000),
+                    amount=random.randint(5000, 15000),
                     type="income",
                     category=categories["Freelance"],
                     date=date,
-                    description="Freelance Work"
+                    description="Freelance Work",
                 )
 
-            # 💸 Daily expenses
+            # Daily expenses
             for _ in range(random.randint(0, 2)):
                 Transaction.objects.create(
                     user=user,
                     amount=random.randint(100, 1200),
                     type="expense",
-                    category=random.choice([
-                        categories["Food"],
-                        categories["Transport"],
-                        categories["Entertainment"],
-                        categories["Shopping"],
-                        categories["Bills"],
-                    ]),
+                    category=random.choice(
+                        [
+                            categories["Food"],
+                            categories["Transport"],
+                            categories["Entertainment"],
+                            categories["Shopping"],
+                            categories["Bills"],
+                        ]
+                    ),
                     date=date,
-                    description="Daily Expense"
+                    description="Daily Expense",
                 )
 
-        self.stdout.write(self.style.SUCCESS("✅ Fresh realistic data generated!"))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "✅ Fresh realistic data generated!"
+            )
+        )

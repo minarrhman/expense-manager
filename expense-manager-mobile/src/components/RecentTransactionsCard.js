@@ -1,12 +1,34 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+} from "react-native";
+
 import TransactionCard from "./TransactionCard";
+import { useTheme } from "../theme/ThemeProvider";
 
-const RecentTransactionsCard = ({ transactions }) => {
+const RecentTransactionsCard = ({ transactions,onPress }) => {
+    const { colors } = useTheme();
+
     return (
-        <View style={styles.card}>
-
-            <Text style={styles.header}>
+        <View
+            style={[
+                styles.card,
+                {
+                    backgroundColor: colors.card,
+                },
+            ]}
+        >
+            <Text
+                style={[
+                    styles.header,
+                    {
+                        color: colors.text,
+                    },
+                ]}
+            >
                 🧾 Recent Transactions
             </Text>
 
@@ -19,10 +41,19 @@ const RecentTransactionsCard = ({ transactions }) => {
                 />
             ))}
 
-            <Text style={styles.seeAll}>
-                See All →
-            </Text>
-
+            <TouchableOpacity
+            onPress={onPress}>
+                <Text
+                    style={[
+                        styles.seeAll,
+                        {
+                            color: colors.primary,
+                        },
+                    ]}
+                >
+                    See All →
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -31,10 +62,18 @@ export default RecentTransactionsCard;
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: "#fff",
         padding: 15,
         borderRadius: 14,
         marginBottom: 20,
+
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 5,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+
         elevation: 3,
     },
 
@@ -42,12 +81,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "bold",
         marginBottom: 10,
-        color: "#333",
     },
 
     seeAll: {
         marginTop: 10,
-        color: "#3498db",
         fontWeight: "600",
         textAlign: "left",
     },

@@ -51,7 +51,7 @@ export default function AddEditBudgetLimitScreen({
         try {
             const data = await getCategories();
 
-            const expenseCategories = data.results.filter(
+            const expenseCategories = data.filter(
                 (cat) => cat.type === "expense"
             );
 

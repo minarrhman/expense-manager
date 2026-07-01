@@ -1,45 +1,66 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useTheme } from "../theme/ThemeProvider";
 
 const BudgetProgressBar = ({ percentage, status }) => {
+    const { colors } = useTheme();
+
     const progress = Math.min(percentage, 100);
 
     const getColor = () => {
         switch (status) {
             case "safe":
-                return "#22C55E"; // Green
+                return "#22C55E";
             case "warning":
-                return "#F59E0B"; // Orange
+                return "#F59E0B";
             case "exceeded":
-                return "#EF4444"; // Red
+                return "#EF4444";
             default:
                 return "#3B82F6";
         }
     };
 
+    const statusColor = getColor();
+
     return (
         <View style={styles.container}>
-            <View style={styles.track}>
+            <View
+                style={[
+                    styles.track,
+                    {
+                        backgroundColor: colors.border,
+                    },
+                ]}
+            >
                 <View
                     style={[
                         styles.progress,
                         {
                             width: `${progress}%`,
-                            backgroundColor: getColor(),
+                            backgroundColor: statusColor,
                         },
                     ]}
                 />
             </View>
 
             <View style={styles.footer}>
-                <Text style={styles.percent}>
+                <Text
+                    style={[
+                        styles.percent,
+                        {
+                            color: colors.secondaryText,
+                        },
+                    ]}
+                >
                     {percentage.toFixed(0)}% Used
                 </Text>
 
                 <View
                     style={[
                         styles.badge,
-                        { backgroundColor: getColor() },
+                        {
+                            backgroundColor: statusColor,
+                        },
                     ]}
                 >
                     <Text style={styles.badgeText}>
@@ -60,7 +81,6 @@ const styles = StyleSheet.create({
 
     track: {
         height: 10,
-        backgroundColor: "#E5E7EB",
         borderRadius: 8,
         overflow: "hidden",
     },
@@ -80,7 +100,6 @@ const styles = StyleSheet.create({
     percent: {
         fontSize: 13,
         fontWeight: "600",
-        color: "#555",
     },
 
     badge: {
@@ -90,7 +109,7 @@ const styles = StyleSheet.create({
     },
 
     badgeText: {
-        color: "#fff",
+        color: "#FFF",
         fontSize: 11,
         fontWeight: "bold",
     },

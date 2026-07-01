@@ -27,8 +27,7 @@ export default function RegisterScreen({navigation}){
     return;
     }
     try {
-      const formattedDate = date.toISOString().split("T")[0];
-
+      const formattedDate = new Date().toLocaleDateString("en-CA")
       await registerUser(
         first_name,
         last_name,

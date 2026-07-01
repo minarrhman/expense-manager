@@ -1,37 +1,54 @@
 import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
+import { useTheme } from "../theme/ThemeProvider";
 
 export default function InputField({
-  label,
-  error,
-  ...props
+    label,
+    error,
+    ...props
 }) {
-  return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder={ label}
-        {...props}
-      />
+    const { colors } = useTheme();
 
-      {error && <Text style={styles.error}>{error}</Text>}
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <TextInput
+                style={[
+                    styles.input,
+                    {
+                        backgroundColor: colors.card,
+                        color: colors.text,
+                        borderColor: error ? "#EF4444" : colors.border,
+                    },
+                ]}
+                placeholder={label}
+                placeholderTextColor={colors.secondaryText}
+                {...props}
+            />
+
+            {error && (
+                <Text style={styles.error}>
+                    {error}
+                </Text>
+            )}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    padding: 12,
-  },
-  error: {
-    color: "red",
-    fontSize: 12,
-    marginTop: 4,
-  },
+    container: {
+        marginBottom: 12,
+    },
+
+    input: {
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 12,
+        fontSize: 16,
+    },
+
+    error: {
+        color: "#EF4444",
+        fontSize: 12,
+        marginTop: 4,
+    },
 });

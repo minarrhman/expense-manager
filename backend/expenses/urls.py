@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (CategoryListCreateView, TransactionListCreateView, RegisterView,
+from .views import (CategoryListView, TransactionListCreateView, RegisterView,
     CategoryLimitDetailView,CategoryLimitView,
     DashboardView,ProfileView, ReportSummaryView,
     CategoryBreakdownView, MonthlyTrendView,TransactionDetailView,
@@ -13,7 +13,7 @@ urlpatterns = [
     path('login/' , TokenObtainPairView.as_view()),
     path('profile/', ProfileView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
-    path('categories/', CategoryListCreateView.as_view()),
+    path('categories/', CategoryListView.as_view()),
     path('category-limits/',CategoryLimitView.as_view()),
     path('category-limits/<int:pk>/', CategoryLimitDetailView.as_view()),
     path('savings-goal/',SavingsGoalView.as_view()),
