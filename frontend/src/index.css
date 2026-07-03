@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+/* ---------- Light Theme ---------- */
+
+:root {
+
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-hover: #f9fafb;
+
+  --text: #111827;
+  --text-secondary: #6b7280;
+
+  --border: #e5e7eb;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+
+}
+
+/* ---------- Dark Theme ---------- */
+
+html.dark {
+
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface-hover: #374151;
+
+  --text: #f9fafb;
+  --text-secondary: #9ca3af;
+
+  --border: #374151;
+
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+
+}
+
+@theme {
+
+  --color-app-bg: var(--bg);
+
+  --color-surface: var(--surface);
+
+  --color-surface-hover: var(--surface-hover);
+
+  --color-text-primary: var(--text);
+
+  --color-text-secondary: var(--text-secondary);
+
+  --color-border: var(--border);
+
+  --color-primary: var(--primary);
+
+  --color-primary-hover: var(--primary-hover);
+
+}

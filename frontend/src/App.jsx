@@ -1,29 +1,49 @@
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import Settings from "./pages/Settings";
-import Reports from "./pages/Reports";
-import Transactions from "./pages/Transactions"
-import Budget from "./pages/Budget"
-import Navbar from "./Components/Navbar"
 
-function App(){
-  return (  
-    <div className="flex bg-gray-100 min-h-screen">
-      <div className="sticky top-0 h-screen">
-        <Navbar/>
-      </div>
-      
-     <main className="flex-1 p-6 overflow-y-auto">
-      <Routes>
-        <Route path="/" element={<Dashboard/>} />
-        <Route path="/transactions" element={<Transactions/>} />
-        <Route path="/budget" element={<Budget/>} />
-        <Route path="/reports" element={<Reports/>} />
-        <Route path="/reports" element={<Settings/>} />
-      </Routes>
-    </main>
-    </div>
-    )
+import Dashboard from "./pages/Dashboard";
+import Transactions from "./pages/Transactions";
+import Budget from "./pages/Budget";
+import Reports from "./pages/Reports";
+import Profile from "./pages/Profile";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import FAQ from "./pages/FAQ";
+import About from "./pages/About";
+
+import Layout from "./Components/Layout";
+import ProtectedRoute from "./Components/ProtectedRoute";
+
+function App() {
+
+    return (
+
+        <Routes>
+
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <Layout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/budget" element={<Budget />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path='/faq' element={<FAQ/>} />
+                <Route path='/about' element={<About/>} />
+
+            </Route>
+
+        </Routes>
+
+    );
 
 }
+
 export default App;

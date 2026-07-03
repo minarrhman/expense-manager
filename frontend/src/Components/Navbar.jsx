@@ -7,42 +7,43 @@ function Navbar() {
         Transactions: "/transactions",
         Budget: "/budget",
         Reports: "/reports",
-        Settings: "/settings",
+        Profile: "/profile",
     };
 
     return (
-        <div className="w-64 h-screen bg-gray-900 text-white p-5 flex flex-col">
 
-            <h1 className="text-xl font-bold mb-8">
-                Expense Bucket
+        <div className="w-64 h-screen bg-surface border-r border-border text-text-primary p-5 flex flex-col">
+
+            <h1 className="text-2xl font-bold mb-10">
+                Expense Flow
             </h1>
 
-            <ul className="space-y-4">
+            <ul className="space-y-2">
 
-                {
-                    Object.entries(menu).map(([item, link]) => (
+                {Object.entries(menu).map(([item, link]) => (
 
-                        <NavLink
-                            key={item}
-                            to={link}
-                            className={({ isActive }) =>
-                                `block p-2 rounded transition ${
-                                    isActive
-                                        ? "bg-gray-700 text-green-500 font-bold"
-                                        : "hover:bg-gray-800"
-                                }`
-                            }
-                        >
-                            {item}
-                        </NavLink>
+                    <NavLink
+                        key={item}
+                        to={link}
+                        className={({ isActive }) =>
+                            `block rounded-xl px-4 py-3 transition-all duration-200 ${
+                                isActive
+                                    ? "bg-primary text-white shadow"
+                                    : "hover:bg-surface-hover"
+                            }`
+                        }
+                    >
+                        {item}
+                    </NavLink>
 
-                    ))
-                }
+                ))}
 
             </ul>
 
         </div>
+
     );
+
 }
 
 export default Navbar;

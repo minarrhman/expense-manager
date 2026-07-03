@@ -1,59 +1,71 @@
-import React, {useState, useRef, useEffect} from "react";
-import {View, Animated, Image, StyleSheet} from "react-native";
+import React, { useRef, useEffect } from "react";
+import { View, Animated, StyleSheet } from "react-native";
 import { getToken } from "../utils/storage";
 
-export default function SplashScreen({navigation}) {
-    const fadeAnim = useRef( new Animated.Value(0)).current;
+export default function SplashScreen({ navigation }) {
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
-    const checkAuth = async () => {
-      const token = await getToken();
+        let isMounted = true;
 
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1200,
-        useNativeDriver: true,
-      }).start(() => {
-        setTimeout(() => {
-          if (token) {
-            navigation.replace("Main");
-          } else {
-            navigation.replace("Login");
-          }
-        }, 300);
-      });
-    };
+        const startApp = async () => {
+            try {
+                // Start both tasks in parallel
+                const tokenPromise = getToken();
 
-    checkAuth();
-  }, []);
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 1200,
+                    useNativeDriver: true,
+                }).start();
+
+                const token = await tokenPromise;
+
+                // Ensure splash is visible minimum duration
+                setTimeout(() => {
+                    if (!isMounted) return;
+
+                    if (token) {
+                        navigation.replace("Main");
+                    } else {
+                        navigation.replace("Login");
+                    }
+                }, 1200); // matches animation duration
+            } catch (e) {
+                navigation.replace("Login");
+            }
+        };
+
+        startApp();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     return (
         <View style={styles.container}>
             <Animated.Image
-            source={require("../../assets/logo.png")}
-            style={
-                [
+                source={require("../../assets/logo.png")}
+                style={[
                     styles.logo,
-                    {
-                        opacity: fadeAnim,
-                    },
-                ]
-            }
+                    { opacity: fadeAnim },
+                ]}
             />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
+    container: {
+        flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
     },
-    logo:{
-        width:220,
+    logo: {
+        width: 220,
         height: 220,
-        resizeMode: "contain"
+        resizeMode: "contain",
     },
 });

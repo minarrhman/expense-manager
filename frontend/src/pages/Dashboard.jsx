@@ -3,71 +3,145 @@ import API from "../services/api";
 import Card from "../Components/Cards";
 import TransactionList from "../Components/TransactionList";
 import TransactionForm from "../Components/TransactionForm";
+import AIInsightCard from "../Components/AIInsightCard";
+import CategoryWarnings from "../Components/CategoryWarnings";
 
 function Dashboard() {
-  const [data, setData] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+    const [data, setData] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    fetchDashboard();
+    useEffect(() => {
+        fetchDashboard();
+    }, []);
 
-  },[]);
-  const fetchDashboard = async () => {
-    try{
-      const res = await API.get("api/dashboard/");
-      setData(res.data);
-    }catch(err){
-      console.error(err.response?.data);
+    const fetchDashboard = async () => {
+        try {
+            const res = await API.get("/api/dashboard/");
+            setData(res.data);
+        } catch (err) {
+            console.error(err.response?.data);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAdd = async () => {
+        await fetchDashboard();
+        setShowModal(false);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen bg-app-bg text-text-primary">
+                <h2 className="text-lg font-semibold">
+                    Loading...
+                </h2>
+            </div>
+        );
     }
-  };
-  const handleAdd = async () => {
-    await fetchDashboard();
-    setShowModal(false);
-  }
 
-  if (!data) return <div>Loading...</div>;
+    return (
+        <>
+            <div className="flex-1 bg-app-bg min-h-screen p-6 transition-colors duration-300">
 
-  return (
-    <>
-      <div className="flex-1 bg-gray-100 min-h-screen p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold mb-6">
-            Welcome Back!
-            </h1>
+                {/* Header */}
 
-            <button onClick={()=> setShowModal(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded">
-              +Add Transaction
-            </button>
-          </div>
+                <div className="flex justify-between items-center mb-8">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card title="Balance" amount={`${data.balance}`} />
-            <Card title="Income" amount={`${data.total_income}`} />
-            <Card title="Expenses" amount={`${data.total_expense}`} />
-            <Card
-            title='Saving Goals'
-            amount="2000"
-            change="+62%"/>
-          </div>
-          <TransactionList transactions={data.recent_transactions}/>
-        </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
+                    <div>
 
-            <button onClick={()=>{setShowModal(false)}}
-              className="absolute top-2 right-2 text-gray">
-                x
-            </button>
-            <TransactionForm onAdd={handleAdd}/>
+                        <h1 className="text-3xl font-bold text-text-primary">
+                            Welcome Back, {data.name}! 👋
+                        </h1>
 
-          </div>
+                        <p className="text-text-secondary mt-1">
+                            Here's your financial overview.
+                        </p>
 
-        </div>
-      )}
-      </>
-      );
+                    </div>
+
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-lg shadow transition"
+                    >
+                        + Add Transaction
+                    </button>
+
+                </div>
+
+                {/* Summary Cards */}
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+
+                    <Card
+                        title="Balance"
+                        amount={Number(data.balance).toLocaleString()}
+                    />
+
+                    <Card
+                        title="Income"
+                        amount={Number(data.total_income).toLocaleString()}
+                    />
+
+                    <Card
+                        title="Expenses"
+                        amount={Number(data.total_expense).toLocaleString()}
+                    />
+
+                </div>
+
+                {/* AI Insight */}
+
+                <AIInsightCard insight={data.ai_insight} />
+
+                {/* Category Warnings */}
+
+                <CategoryWarnings
+                    warnings={data.category_warnings}
+                />
+
+                {/* Recent Transactions */}
+
+                <div className="mt-8">
+
+                    <h2 className="text-xl font-bold text-text-primary mb-4">
+                        Recent Transactions
+                    </h2>
+
+                    <TransactionList
+                        transactions={data.recent_transactions}
+                    />
+
+                </div>
+
+            </div>
+
+            {/* Add Transaction Modal */}
+
+            {showModal && (
+
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+                    <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-md p-6 relative transition-colors duration-300">
+
+                        <button
+                            onClick={() => setShowModal(false)}
+                            className="absolute top-3 right-4 text-2xl text-text-secondary hover:text-red-500 transition"
+                        >
+                            ×
+                        </button>
+
+                        <TransactionForm onAdd={handleAdd} />
+
+                    </div>
+
+                </div>
+
+            )}
+
+        </>
+    );
 }
 
 export default Dashboard;

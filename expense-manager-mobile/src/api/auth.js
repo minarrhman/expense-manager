@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.0.163:8000/api";
+const BASE_URL = "https://expense-manager-backend-qx1a.onrender.com/api";
 
 export default async function loginUser(username, password){
     const response = await fetch(`${BASE_URL}/login/`, {

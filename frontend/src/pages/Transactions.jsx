@@ -1,133 +1,223 @@
-import { useState ,useEffect } from 'react';
-
-import TransactionList from '../Components/TransactionList';
+import { useState, useEffect } from "react";
+import TransactionList from "../Components/TransactionList";
 import API from "../services/api";
 import TransactionForm from "../Components/TransactionForm";
 
-
 function Transactions() {
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [showModal, setShowModal] = useState(false);
+
+  // ✅ EDIT STATES
+  const [editTransaction, setEditTransaction] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [range, setRange] = useState("this_month");
   const [page, setPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchTransactions();
-  },[page,search, filter]);
+  }, [page, search, filter, range]);
 
   const fetchTransactions = async () => {
-    try{
-       const res = await API.get(`api/transactions/?page=${page}&search=${search}&type=${filter}`);
+    try {
+      const res = await API.get(
+        `/api/transactions/?page=${page}&search=${search}&type=${filter}&range=${range}`
+      );
+
       setData(res.data);
-    }catch(err){
+    } catch (err) {
       console.error(err.response?.data);
     }
   };
-  const handleAdd = async () => {
+
+  // ======================
+  // ADD SUCCESS
+  // ======================
+  const handleAddSuccess = async () => {
     await fetchTransactions();
     setShowModal(false);
-  }
+  };
 
+  // ======================
+  // EDIT OPEN
+  // ======================
+  const handleEdit = (transaction) => {
+    setEditTransaction(transaction);
+    setShowEditModal(true);
+  };
+
+  // ======================
+  // EDIT SUCCESS
+  // ======================
+  const handleEditSuccess = async () => {
+    await fetchTransactions();
+    setShowEditModal(false);
+  };
 
   return (
-    <div className="flex-1 bg-gray-100 min-h-screen p-6">
+    <div className="flex-1 bg-app-bg min-h-screen p-6 transition-colors duration-300">
+
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
-         <input
-              type="text"
-              placeholder="Search transactions..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-3xl p-3 rounded-xl border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button onClick={()=> setShowModal(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded">
-              +Add Transaction
+
+        <div className="flex items-center gap-3 w-full max-w-3xl">
+
+          <input
+            type="text"
+            placeholder="Search transactions..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="flex-1 p-3 rounded-xl border border-border bg-surface text-text-primary placeholder:text-text-secondary shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+
+          <div className="relative">
+
+            <button
+              onClick={() => setShowFilter(!showFilter)}
+              className="bg-surface border border-border text-text-primary px-4 py-3 rounded-xl shadow hover:bg-surface-hover transition"
+            >
+              Filter ▼
             </button>
+
+            {showFilter && (
+              <div className="absolute right-0 mt-2 w-72 bg-surface border border-border rounded-xl shadow-xl p-5 z-50">
+
+                <h3 className="font-semibold text-text-primary mb-3">
+                  Transaction Type
+                </h3>
+
+                <select
+                  value={filter}
+                  onChange={(e) => {
+                    setFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full bg-app-bg border border-border rounded-lg p-2 text-text-primary mb-4"
+                >
+                  <option value="all">All</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+
+                <h3 className="font-semibold text-text-primary mb-3">
+                  Date Range
+                </h3>
+
+                <select
+                  value={range}
+                  onChange={(e) => {
+                    setRange(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full bg-app-bg border border-border rounded-lg p-2 text-text-primary"
+                >
+                  <option value="this_month">This Month</option>
+                  <option value="last_month">Last Month</option>
+                  <option value="3m">Last 3 Months</option>
+                  <option value="6m">Last 6 Months</option>
+                  <option value="year">This Year</option>
+                </select>
+
+              </div>
+            )}
+
           </div>
-          <div className="flex gap-3 mb-6">
-          <button
-            onClick={() => setFilter("all")}
-            className={`px-2 py-0.5 rounded-full text-sm font-medium transition ${
-              filter === "all"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-700 border"
-            }`}
-          >
-            All
-          </button>
 
-          <button
-            onClick={() => setFilter("income")}
-            className={`px-2 py-0.5 rounded-full text-sm font-medium transition ${
-              filter === "income"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-700 border"
-            }`}
-          >
-            Income
-          </button>
-
-          <button
-            onClick={() => setFilter("expense")}
-            className={`px-2 py-0.5 rounded-full text-sm font-medium transition ${
-              filter === "expense"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-700 border"
-            }`}
-          >
-            Expense
-          </button>
         </div>
-      <div>
-      <TransactionList transactions={data?.results || []} />
-      <div className="flex justify-center items-center gap-4 mt-4">
+
+        <button
+          onClick={() => setShowModal(true)}
+          className="ml-4 bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-lg shadow transition"
+        >
+          + Add Transaction
+        </button>
+
+      </div>
+
+      {/* Transactions */}
+      <TransactionList
+        transactions={data?.results || []}
+        onEdit={handleEdit}  
+        editable={true}
+      />
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-4 mt-6">
+
         <button
           disabled={!data.previous}
           onClick={() => setPage(page - 1)}
-          className={`px-2 py-1 rounded-lg font-medium ${
-            data.previous
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`px-4 py-2 rounded-lg transition ${data.previous
+              ? "bg-primary hover:bg-primary-hover text-white"
+              : "bg-border text-text-secondary cursor-not-allowed"
+            }`}
         >
           Previous
         </button>
 
-        <span className="font-semibold text-gray-700">
+        <span className="font-semibold text-text-primary">
           Page {page}
         </span>
 
         <button
           disabled={!data.next}
           onClick={() => setPage(page + 1)}
-          className={`px-2 py-1 rounded-lg font-medium ${
-            data.next
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`px-4 py-2 rounded-lg transition ${data.next
+              ? "bg-primary hover:bg-primary-hover text-white"
+              : "bg-border text-text-secondary cursor-not-allowed"
+            }`}
         >
           Next
         </button>
-</div>
-      </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
 
-            <button onClick={()=>{setShowModal(false)}}
-              className="absolute top-2 right-2 text-gray">
-                x
-            </button>
-            <TransactionForm onAdd={handleAdd}/>
+      </div>
+
+      {/* ======================
+          ADD MODAL
+      ====================== */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+          <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-md p-6">
+
+            <TransactionForm
+              mode="create"
+              onSuccess={handleAddSuccess}
+              onCancel={() => setShowModal(false)}
+            />
 
           </div>
-
         </div>
       )}
+
+      {/* ======================
+          EDIT MODAL
+      ====================== */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+          <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-md p-6">
+
+            <TransactionForm
+              mode="edit"
+              initialData={editTransaction}
+              onSuccess={handleEditSuccess}
+              onCancel={() => setShowEditModal(false)}
+            />
+
+          </div>
+        </div>
+      )}
+
     </div>
-)
+  );
 }
 
 export default Transactions;

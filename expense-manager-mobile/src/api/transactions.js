@@ -1,6 +1,6 @@
 import { getToken, removeToken } from "../utils/storage";
 
-const BASE_URL = "http://192.168.0.163:8000/api";
+const BASE_URL = "https://expense-manager-backend-qx1a.onrender.com/api";
 
 export const getTransactions = async (
     page = 1,

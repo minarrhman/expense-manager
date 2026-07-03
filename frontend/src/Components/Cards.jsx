@@ -1,16 +1,46 @@
-function Card({title, amount, change}) {
+import { useSettings } from "../context/SettingsContext";
+
+function Card({ title, amount, change }) {
+
     const isPositive = change?.includes("+");
 
-    return(
-        <div className="bg-white p-5 rounded-xl shadow">
+    const { currency } = useSettings();
+
+    const symbols = {
+        BDT: "৳",
+        USD: "$",
+        EUR: "€",
+        GBP: "£",
+    };
+
+    return (
+        <div className="bg-surface rounded-xl shadow border border-border p-5 transition-colors duration-300">
+
             <div className="flex justify-between items-center">
-                <h3 className="text-gray-500 text-sm">{title}</h3>
-                { change &&
-                    (<span className={`text-sm ${isPositive?"text-green-500":"text-red-500"}`}>{change}</span>)
-                    }
+
+                <h3 className="text-text-secondary text-sm">
+                    {title}
+                </h3>
+
+                {change && (
+                    <span
+                        className={`text-sm ${
+                            isPositive
+                                ? "text-green-500"
+                                : "text-red-500"
+                        }`}
+                    >
+                        {change}
+                    </span>
+                )}
 
             </div>
-            <h2 className="text-2xl font-bold mt-2">৳{amount}</h2>
+
+            <h2 className="text-3xl font-bold text-text-primary mt-3">
+                {symbols[currency]}
+                {amount}
+            </h2>
+
         </div>
     );
 }

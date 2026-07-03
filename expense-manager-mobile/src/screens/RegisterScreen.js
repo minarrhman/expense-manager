@@ -1,230 +1,287 @@
-import React, {useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, Platform, StyleSheet,} from "react-native";
-import {registerUser} from '../api/auth';
-import DateTimePicker from "@react-native-community/datetimepicker"
-import InputField from '../components/InputField';
+import React, { useState } from "react";
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function RegisterScreen({navigation}){
+import { registerUser } from "../api/auth";
+import InputField from "../components/InputField";
+import { useTheme } from "../theme/ThemeProvider";
 
-  const [errors, setErrors] = useState({});
-  const [first_name, setFirstName] = useState("");
-  const [last_name, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+export default function RegisterScreen({ navigation }) {
+    const { colors } = useTheme();
 
-  const [date, setDate] = useState(new Date());
-  const [showPicker, setShowPicker] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [first_name, setFirstName] = useState("");
+    const [last_name, setLastName] = useState("");
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = async () =>{
+    const [date, setDate] = useState(new Date());
+    const [showPicker, setShowPicker] = useState(false);
 
-    setErrors({});
-    if (password !== confirmPassword) {
-      setErrors({
-          confirmPassword: "Passwords do not match"
-      });
-    return;
-    }
-    try {
-      const formattedDate = new Date().toLocaleDateString("en-CA")
-      await registerUser(
-        first_name,
-        last_name,
-        email,
-        username,
-        password,
-        formattedDate,
-      );
-      alert("Registration Successful");
+    const handleRegister = async () => {
+        setErrors({});
 
-      navigation.replace("Login")
-    } catch(errorData) {
-      let newErrors = {};
-
-      for (const field in errorData){
-        if (Array.isArray(errorData[field])) {
-          newErrors[field] = errorData[field][0];
-        } else {
-          newErrors[field] = errorData[field];
+        if (password !== confirmPassword) {
+            setErrors({
+                confirmPassword: "Passwords do not match",
+            });
+            return;
         }
-      }
-      
-      setErrors(newErrors)
-    }
-  }
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
+        try {
+            const formattedDate = date
+                .toISOString()
+                .split("T")[0];
 
-        <Text style={styles.title}>Create Account</Text>
+            await registerUser(
+                first_name,
+                last_name,
+                email,
+                username,
+                password,
+                formattedDate
+            );
 
-        <InputField
-          label="Username"
-          value={username}
-          onChangeText={setUsername}
-          error={errors.username}
-        />
+            alert("Registration Successful");
 
-        <InputField
-          label="First Name"
-          value={first_name}
-          onChangeText={setFirstName}
-        />
+            navigation.replace("Login");
+        } catch (errorData) {
+            let newErrors = {};
 
-        <InputField 
-          label='Last Name'
-          value={last_name}
-          onChangeText={setLastName}
-        />
+            for (const field in errorData) {
+                if (Array.isArray(errorData[field])) {
+                    newErrors[field] = errorData[field][0];
+                } else {
+                    newErrors[field] = errorData[field];
+                }
+            }
 
-        <InputField
-          label='Email'
-          keyboardType='email-address'
-          autoCapitalize='none'
-          value={email}
-          onChangeText={setEmail}
-          error={errors.email}
-        />
-
-        <InputField
-        label='Password'
-        secureTextEntry={true}
-        value={password}
-        onChangeText={setPassword}
-        />
-
-        <InputField
-          label="Confirm Password"
-          secureTextEntry={true}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          error={errors.confirmPassword}
-        />
-
-        <TouchableOpacity style={styles.dateButton}
-        onPress={() => setShowPicker(true)}>
-          <Text style={styles.dateText}>
-            {date.toLocaleDateString()}
-          </Text>
-        </TouchableOpacity>
-        {errors.date_of_birth && (
-          <Text style={styles.errorText}>
-            {errors.date_of_birth}
-          </Text>
-        )}
-        {
-          showPicker && (
-            <DateTimePicker value={date}
-            mode='date'
-            display='default'
-            maximumDate={new Date()}
-            onChange = {(event, selectedData) =>{
-              setShowPicker(false);
-
-              if (selectedData){
-                setDate(selectedData);
-              }
-            }}
-            />
-          )
+            setErrors(newErrors);
         }
-        <TouchableOpacity style={styles.registerButton}
-        onPress={handleRegister}>
+    };
 
-          <Text style={styles.registerButtonText}> Register</Text>
-        </TouchableOpacity>
+    return (
+        <View
+            style={[
+                styles.container,
+                {
+                    backgroundColor: colors.background,
+                },
+            ]}
+        >
+            <View
+                style={[
+                    styles.card,
+                    {
+                        backgroundColor: colors.card,
+                    },
+                ]}
+            >
+                <Text
+                    style={[
+                        styles.title,
+                        {
+                            color: colors.text,
+                        },
+                    ]}
+                >
+                    Create Account
+                </Text>
 
-        <TouchableOpacity onPress={ () => navigation.navigate('Login')}>
-          <Text style={styles.loginLink}>
-            Already have an account? Login
-          </Text>
-                    
-        </TouchableOpacity>
-      </View>
+                <InputField
+                    label="Username"
+                    value={username}
+                    onChangeText={setUsername}
+                    error={errors.username}
+                />
 
+                <InputField
+                    label="First Name"
+                    value={first_name}
+                    onChangeText={setFirstName}
+                />
 
-    </View>
-  )
+                <InputField
+                    label="Last Name"
+                    value={last_name}
+                    onChangeText={setLastName}
+                />
+
+                <InputField
+                    label="Email"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={email}
+                    onChangeText={setEmail}
+                    error={errors.email}
+                />
+
+                <InputField
+                    label="Password"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                />
+
+                <InputField
+                    label="Confirm Password"
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    error={errors.confirmPassword}
+                />
+
+                <TouchableOpacity
+                    style={[
+                        styles.dateButton,
+                        {
+                            backgroundColor: colors.input,
+                            borderColor: colors.border,
+                        },
+                    ]}
+                    onPress={() => setShowPicker(true)}
+                >
+                    <Text
+                        style={[
+                            styles.dateText,
+                            {
+                                color: colors.text,
+                            },
+                        ]}
+                    >
+                        {date.toLocaleDateString()}
+                    </Text>
+                </TouchableOpacity>
+
+                {errors.date_of_birth && (
+                    <Text style={styles.errorText}>
+                        {errors.date_of_birth}
+                    </Text>
+                )}
+
+                {showPicker && (
+                    <DateTimePicker
+                        value={date}
+                        mode="date"
+                        display="default"
+                        maximumDate={new Date()}
+                        onChange={(event, selectedDate) => {
+                            setShowPicker(false);
+
+                            if (selectedDate) {
+                                setDate(selectedDate);
+                            }
+                        }}
+                    />
+                )}
+
+                <TouchableOpacity
+                    style={[
+                        styles.registerButton,
+                        {
+                            backgroundColor: colors.primary,
+                        },
+                    ]}
+                    onPress={handleRegister}
+                >
+                    <Text style={styles.registerButtonText}>
+                        Register
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() =>
+                        navigation.navigate("Login")
+                    }
+                >
+                    <Text
+                        style={[
+                            styles.loginLink,
+                            {
+                                color: colors.primary,
+                            },
+                        ]}
+                    >
+                        Already have an account? Login
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+    },
 
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    padding: 20,
-  }, 
-  card: {
-      width: "100%",
-      maxWidth: 400,
-      backgroundColor: "#fff",
-      padding: 25,
-      borderRadius: 15,
+    card: {
+        width: "100%",
+        maxWidth: 400,
+        padding: 25,
+        borderRadius: 15,
 
-      shadowColor: "#000",
-      shadowOffset: {
-          width: 0,
-          height: 3,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
 
-      elevation: 5,
-  },
+        elevation: 5,
+    },
 
-  errorText: {
-    color: "red",
-    fontSize: 12,
-    marginBottom: 10,
-    marginLeft: 5,
-  },
-  title: {
-      fontSize: 28,
-      fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: 25,
-  },
+    title: {
+        fontSize: 28,
+        fontWeight: "bold",
+        textAlign: "center",
+        marginBottom: 25,
+    },
 
-  input: {
-      borderWidth: 1,
-      borderColor: "#ddd",
-      borderRadius: 10,
-      padding: 12,
-      marginBottom: 12,
-  },
+    dateButton: {
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 14,
+        marginBottom: 20,
+    },
 
-  dateButton: {
-      borderWidth: 1,
-      borderColor: "#ddd",
-      borderRadius: 10,
-      padding: 14,
-      marginBottom: 20,
-  },
+    dateText: {
+        fontSize: 15,
+    },
 
-  dateText: {
-      color: "#444",
-  },
+    errorText: {
+        color: "#EF4444",
+        fontSize: 12,
+        marginBottom: 10,
+        marginLeft: 5,
+    },
 
-  registerButton: {
-      backgroundColor: "#000",
-      padding: 15,
-      borderRadius: 10,
-      alignItems: "center",
-  },
+    registerButton: {
+        padding: 15,
+        borderRadius: 10,
+        alignItems: "center",
+    },
 
-  registerButtonText: {
-      color: "#fff",
-      fontWeight: "bold",
-      fontSize: 16,
-  },
+    registerButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
 
-  loginLink: {
-      textAlign: "center",
-      marginTop: 15,
-  },
-})
-
+    loginLink: {
+        textAlign: "center",
+        marginTop: 15,
+        fontWeight: "600",
+    },
+});
