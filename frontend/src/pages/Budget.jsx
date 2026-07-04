@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import API from "../services/api";
 import BudgetCard from "../Components/BudgetCard";
 import BudgetModal from "../Components/BudgetModal";
+import ConfirmModal from "../Components/ConfirmModal"
 
 function Budget() {
     const [limits, setLimits] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deleteBudget, setDeleteBudget] = useState(null);
 
     const [showModal, setShowModal] = useState(false);
     const [editingBudget, setEditingBudget] = useState(null);
@@ -36,6 +38,17 @@ function Budget() {
     const handleEdit = (budget) => {
         setEditingBudget(budget);
         setShowModal(true);
+    };
+    const handleDelete = (budget) => {
+        setDeleteBudget(budget);
+    };
+    const confirmDelete = async () => {
+        try {
+            await API.delete(`/api/category-limits/${deleteBudget.id}/`);
+            await fetchLimits();
+        } finally {
+            setDeleteBudget(null);
+        }
     };
 
     const handleSuccess = async () => {
@@ -114,6 +127,7 @@ function Budget() {
                                 key={item.id}
                                 item={item}
                                 onEdit={handleEdit}
+                                onDelete={handleDelete}
                             />
 
                         ))}
@@ -129,6 +143,13 @@ function Budget() {
                 budget={editingBudget}
                 onClose={() => setShowModal(false)}
                 onSuccess={handleSuccess}
+            />
+            <ConfirmModal
+                open={!!deleteBudget}
+                title="Delete Budget"
+                message={`Delete the budget for "${deleteBudget?.category_name}"? This action cannot be undone.`}
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteBudget(null)}
             />
         </>
     );

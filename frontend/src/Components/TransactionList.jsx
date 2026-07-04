@@ -1,10 +1,12 @@
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { useSettings } from "../context/SettingsContext";
 
 function TransactionList({
     transactions,
     editable = false,
+    deletable = false,
     onEdit,
+    onDelete,
 }) {
 
     const { currency } = useSettings();
@@ -64,8 +66,8 @@ function TransactionList({
 
                             <p
                                 className={`font-bold text-lg ${t.type === "income"
-                                        ? "text-green-500"
-                                        : "text-red-500"
+                                    ? "text-green-500"
+                                    : "text-red-500"
                                     }`}
                             >
                                 {t.type === "income" ? "+" : "-"}
@@ -73,16 +75,29 @@ function TransactionList({
                                 {Number(t.amount).toLocaleString()}
                             </p>
 
-                            {editable && (
-                                <button
-                                    onClick={() => onEdit(t)}
-                                    className="w-9 h-9 rounded-lg border border-border hover:bg-surface-hover transition flex items-center justify-center"
-                                    title="Edit Transaction"
-                                >
-                                    <FaEdit className="text-primary" />
-                                </button>
-                            )}
+                            <div className="flex items-center gap-2">
 
+                                {editable && (
+                                    <button
+                                        onClick={() => onEdit(t)}
+                                        className="w-9 h-9 rounded-lg border border-border hover:bg-surface-hover transition flex items-center justify-center"
+                                        title="Edit Transaction"
+                                    >
+                                        <FaEdit className="text-primary" />
+                                    </button>
+                                )}
+
+                                {deletable && (
+                                    <button
+                                        onClick={() => onDelete(t)}
+                                        className="w-9 h-9 rounded-lg border border-border hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center justify-center"
+                                        title="Delete Transaction"
+                                    >
+                                        <FaTrash className="text-red-500" />
+                                    </button>
+                                )}
+
+                            </div>
                         </div>
 
                     </div>

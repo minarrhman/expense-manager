@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import TransactionList from "../Components/TransactionList";
 import API from "../services/api";
 import TransactionForm from "../Components/TransactionForm";
+import ConfirmModal from "../Components/ConfirmModal";
 
 function Transactions() {
 
@@ -11,6 +12,7 @@ function Transactions() {
   // ✅ EDIT STATES
   const [editTransaction, setEditTransaction] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [deleteTransaction, setDeleteTransaction] = useState(null);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
@@ -50,6 +52,25 @@ function Transactions() {
     setShowEditModal(true);
   };
 
+  // Delete 
+  const handleDelete = (transaction) => {
+    setDeleteTransaction(transaction);
+  };
+
+  // Confrim delete
+  const confirmDelete = async () => {
+    if (!deleteTransaction) return;
+
+    try {
+      await API.delete(`/api/transactions/${deleteTransaction.id}/`);
+
+      await fetchTransactions();
+
+      setDeleteTransaction(null);
+    } catch (err) {
+      console.error(err.response?.data);
+    }
+  };
   // ======================
   // EDIT SUCCESS
   // ======================
@@ -144,9 +165,26 @@ function Transactions() {
       {/* Transactions */}
       <TransactionList
         transactions={data?.results || []}
-        onEdit={handleEdit}  
         editable={true}
+        deletable={true}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
+
+      <ConfirmModal
+        open={!!deleteTransaction}
+        title="Delete Transaction"
+        message={
+          deleteTransaction
+            ? `Are you sure you want to delete "${deleteTransaction.category_name}"? This action cannot be undone.`
+            : ""
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTransaction(null)}
+      />
+
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-4 mt-6">
@@ -155,8 +193,8 @@ function Transactions() {
           disabled={!data.previous}
           onClick={() => setPage(page - 1)}
           className={`px-4 py-2 rounded-lg transition ${data.previous
-              ? "bg-primary hover:bg-primary-hover text-white"
-              : "bg-border text-text-secondary cursor-not-allowed"
+            ? "bg-primary hover:bg-primary-hover text-white"
+            : "bg-border text-text-secondary cursor-not-allowed"
             }`}
         >
           Previous
@@ -170,8 +208,8 @@ function Transactions() {
           disabled={!data.next}
           onClick={() => setPage(page + 1)}
           className={`px-4 py-2 rounded-lg transition ${data.next
-              ? "bg-primary hover:bg-primary-hover text-white"
-              : "bg-border text-text-secondary cursor-not-allowed"
+            ? "bg-primary hover:bg-primary-hover text-white"
+            : "bg-border text-text-secondary cursor-not-allowed"
             }`}
         >
           Next

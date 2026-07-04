@@ -19,6 +19,8 @@ function Dashboard() {
         try {
             const res = await API.get("/api/dashboard/");
             setData(res.data);
+            console.log(res.data)
+            console.log(data.category_warnings)
         } catch (err) {
             console.error(err.response?.data);
         } finally {
@@ -97,9 +99,11 @@ function Dashboard() {
 
                 {/* Category Warnings */}
 
-                <CategoryWarnings
-                    warnings={data.category_warnings}
-                />
+                <div className="mt-6">
+                    <CategoryWarnings
+                        warnings={data.category_warnings}
+                    />
+                </div>
 
                 {/* Recent Transactions */}
 
@@ -132,7 +136,10 @@ function Dashboard() {
                             ×
                         </button>
 
-                        <TransactionForm onAdd={handleAdd} />
+                        <TransactionForm
+                            mode="create"
+                            onSuccess={handleAdd}
+                        />
 
                     </div>
 
