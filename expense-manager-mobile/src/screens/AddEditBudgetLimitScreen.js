@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     StyleSheet,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import Icon, { getCategoryIcon } from "../utils/categoryIcons";
 
@@ -125,194 +126,200 @@ export default function AddEditBudgetLimitScreen({
     };
 
     return (
-        <View
+        <KeyboardAwareScrollView
             style={[
                 styles.container,
                 {
                     backgroundColor: colors.background,
                 },
             ]}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            enableOnAndroid
+            extraScrollHeight={20}
         >
 
-            <Text
-                style={[
-                    styles.title,
-                    {
-                        color: colors.text,
-                    },
-                ]}
-            >
-                {isEdit
-                    ? "Edit Budget Limit"
-                    : "Set Budget Limit"}
-            </Text>
+                <Text
+                    style={[
+                        styles.title,
+                        {
+                            color: colors.text,
+                        },
+                    ]}
+                >
+                    {isEdit
+                        ? "Edit Budget Limit"
+                        : "Set Budget Limit"}
+                </Text>
 
-            <Text
-                style={[
-                    styles.label,
-                    {
-                        color: colors.text,
-                    },
-                ]}
-            >
-                Select Category
-            </Text>
+                <Text
+                    style={[
+                        styles.label,
+                        {
+                            color: colors.text,
+                        },
+                    ]}
+                >
+                    Select Category
+                </Text>
 
-            {isEdit ? (
-                <View style={styles.categoryContainer}>
-                    {categories
-                        .filter((cat) => cat.id === selectedCategory)
-                        .map((cat) => (
-                            <View
-                                key={cat.id}
-                                style={[
-                                    styles.categoryItem,
-                                    styles.selectedCategory,
-                                    {
-                                        backgroundColor: colors.primary,
-                                    },
-                                ]}
-                            >
-                                <View style={styles.categoryContent}>
-                                    <Icon
-                                        name={getCategoryIcon(cat.name)}
-                                        size={18}
-                                        color="#fff"
-                                    />
-
-                                    <Text
-                                        style={[
-                                            styles.categoryText,
-                                            { color: "#fff" },
-                                        ]}
-                                    >
-                                        {cat.name}
-                                    </Text>
-                                </View>
-                            </View>
-                        ))}
-                </View>
-            ) : (
-                <View style={styles.categoryContainer}>
-                    {categories.map((cat) => {
-                        const alreadyHasBudget = budgetLimits.some(
-                            (budget) => budget.category === cat.id
-                        );
-
-                        return (
-                            <TouchableOpacity
-                                key={cat.id}
-                                style={[
-                                    styles.categoryItem,
-                                    {
-                                        backgroundColor: colors.card,
-                                        borderColor: colors.border,
-                                    },
-                                    alreadyHasBudget &&
-                                    styles.disabledCategory,
-                                    selectedCategory === cat.id && [
+                {isEdit ? (
+                    <View style={styles.categoryContainer}>
+                        {categories
+                            .filter((cat) => cat.id === selectedCategory)
+                            .map((cat) => (
+                                <View
+                                    key={cat.id}
+                                    style={[
+                                        styles.categoryItem,
                                         styles.selectedCategory,
                                         {
                                             backgroundColor: colors.primary,
-                                            borderColor: colors.primary,
                                         },
-                                    ],
-                                ]}
-                                disabled={alreadyHasBudget}
-                                onPress={() =>
-                                    setSelectedCategory(cat.id)
-                                }
-                            >
-                                <View style={styles.categoryContent}>
-                                    <Icon
-                                        name={getCategoryIcon(cat.name)}
-                                        size={18}
-                                        color={
-                                            alreadyHasBudget
-                                                ? "#9CA3AF"
-                                                : selectedCategory === cat.id
-                                                    ? "#fff"
-                                                    : colors.primary
-                                        }
-                                    />
+                                    ]}
+                                >
+                                    <View style={styles.categoryContent}>
+                                        <Icon
+                                            name={getCategoryIcon(cat.name)}
+                                            size={18}
+                                            color="#fff"
+                                        />
 
-                                    <Text
-                                        style={[
-                                            styles.categoryText,
-                                            {
-                                                color:
-                                                    alreadyHasBudget
-                                                        ? "#9CA3AF"
-                                                        : selectedCategory === cat.id
-                                                            ? "#fff"
-                                                            : colors.text,
-                                            },
-                                        ]}
-                                    >
-                                        {cat.name}
-                                    </Text>
+                                        <Text
+                                            style={[
+                                                styles.categoryText,
+                                                { color: "#fff" },
+                                            ]}
+                                        >
+                                            {cat.name}
+                                        </Text>
+                                    </View>
                                 </View>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-            )}
+                            ))}
+                    </View>
+                ) : (
+                    <View style={styles.categoryContainer}>
+                        {categories.map((cat) => {
+                            const alreadyHasBudget = budgetLimits.some(
+                                (budget) => budget.category === cat.id
+                            );
 
-            <Text
-                style={[
-                    styles.label,
-                    {
-                        color: colors.text,
-                    },
-                ]}
-            >
-                Budget Limit
-            </Text>
+                            return (
+                                <TouchableOpacity
+                                    key={cat.id}
+                                    style={[
+                                        styles.categoryItem,
+                                        {
+                                            backgroundColor: colors.card,
+                                            borderColor: colors.border,
+                                        },
+                                        alreadyHasBudget &&
+                                        styles.disabledCategory,
+                                        selectedCategory === cat.id && [
+                                            styles.selectedCategory,
+                                            {
+                                                backgroundColor: colors.primary,
+                                                borderColor: colors.primary,
+                                            },
+                                        ],
+                                    ]}
+                                    disabled={alreadyHasBudget}
+                                    onPress={() =>
+                                        setSelectedCategory(cat.id)
+                                    }
+                                >
+                                    <View style={styles.categoryContent}>
+                                        <Icon
+                                            name={getCategoryIcon(cat.name)}
+                                            size={18}
+                                            color={
+                                                alreadyHasBudget
+                                                    ? "#9CA3AF"
+                                                    : selectedCategory === cat.id
+                                                        ? "#fff"
+                                                        : colors.primary
+                                            }
+                                        />
 
-            <TextInput
-                value={limit}
-                onChangeText={setLimit}
-                keyboardType="numeric"
-                placeholder="Enter budget amount"
-                placeholderTextColor={colors.secondaryText}
-                style={[
-                    styles.input,
-                    {
-                        backgroundColor: colors.input,
-                        borderColor: colors.border,
-                        color: colors.text,
-                    },
-                ]}
-            />
+                                        <Text
+                                            style={[
+                                                styles.categoryText,
+                                                {
+                                                    color:
+                                                        alreadyHasBudget
+                                                            ? "#9CA3AF"
+                                                            : selectedCategory === cat.id
+                                                                ? "#fff"
+                                                                : colors.text,
+                                                },
+                                            ]}
+                                        >
+                                            {cat.name}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                )}
 
-            <TouchableOpacity
-                style={[
-                    styles.button,
-                    {
-                        backgroundColor: colors.primary,
-                    },
-                ]}
-                onPress={handleSave}
-            >
-                <Text style={styles.buttonText}>
-                    {isEdit
-                        ? "Update Budget"
-                        : "Save Budget"}
-                </Text>
-            </TouchableOpacity>
-
-            {isEdit && (
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={handleDelete}
+                <Text
+                    style={[
+                        styles.label,
+                        {
+                            color: colors.text,
+                        },
+                    ]}
                 >
-                    <Text style={styles.deleteButtonText}>
-                        Delete Budget
+                    Budget Limit
+                </Text>
+
+                <TextInput
+                    value={limit}
+                    onChangeText={setLimit}
+                    keyboardType="numeric"
+                    placeholder="Enter budget amount"
+                    placeholderTextColor={colors.secondaryText}
+                    style={[
+                        styles.input,
+                        {
+                            backgroundColor: colors.input,
+                            borderColor: colors.border,
+                            color: colors.text,
+                        },
+                    ]}
+                />
+
+                <TouchableOpacity
+                    style={[
+                        styles.button,
+                        {
+                            backgroundColor: colors.primary,
+                        },
+                    ]}
+                    onPress={handleSave}
+                >
+                    <Text style={styles.buttonText}>
+                        {isEdit
+                            ? "Update Budget"
+                            : "Save Budget"}
                     </Text>
                 </TouchableOpacity>
-            )}
 
-        </View>
+                {isEdit && (
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={handleDelete}
+                    >
+                        <Text style={styles.deleteButtonText}>
+                            Delete Budget
+                        </Text>
+                    </TouchableOpacity>
+                )}
+
+
+        </KeyboardAwareScrollView>
     );
 }
 

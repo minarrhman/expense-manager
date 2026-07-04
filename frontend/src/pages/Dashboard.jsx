@@ -45,19 +45,19 @@ function Dashboard() {
 
     return (
         <>
-            <div className="flex-1 bg-app-bg min-h-screen p-6 transition-colors duration-300">
+            <div className="flex-1 min-h-screen bg-app-bg p-4 sm:p-6 lg:p-8 transition-colors duration-300">
 
                 {/* Header */}
 
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
 
-                    <div>
+                    <div className="min-w-0">
 
-                        <h1 className="text-3xl font-bold text-text-primary">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary break-words">
                             Welcome Back, {data.name}! 👋
                         </h1>
 
-                        <p className="text-text-secondary mt-1">
+                        <p className="text-sm sm:text-base text-text-secondary mt-1">
                             Here's your financial overview.
                         </p>
 
@@ -65,7 +65,7 @@ function Dashboard() {
 
                     <button
                         onClick={() => setShowModal(true)}
-                        className="bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-lg shadow transition"
+                        className="w-full md:w-auto bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-lg shadow transition"
                     >
                         + Add Transaction
                     </button>
@@ -125,9 +125,9 @@ function Dashboard() {
 
             {showModal && (
 
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
 
-                    <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-md p-6 relative transition-colors duration-300">
+                    <div className="relative w-full max-w-md rounded-xl border border-border bg-surface shadow-xl p-5 sm:p-6 transition-colors duration-300 max-h-[90vh] overflow-y-auto">
 
                         <button
                             onClick={() => setShowModal(false)}

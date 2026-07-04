@@ -6,6 +6,7 @@ import {
     StyleSheet,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { registerUser } from "../api/auth";
 import InputField from "../components/InputField";
@@ -68,152 +69,166 @@ export default function RegisterScreen({ navigation }) {
     };
 
     return (
-        <View
+        <KeyboardAwareScrollView
             style={[
                 styles.container,
                 {
                     backgroundColor: colors.background,
                 },
             ]}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            enableOnAndroid
+            extraScrollHeight={20}
         >
             <View
                 style={[
-                    styles.card,
+                    styles.container,
                     {
-                        backgroundColor: colors.card,
+                        backgroundColor: colors.background,
                     },
                 ]}
             >
-                <Text
+                <View
                     style={[
-                        styles.title,
+                        styles.card,
                         {
-                            color: colors.text,
+                            backgroundColor: colors.card,
                         },
                     ]}
-                >
-                    Create Account
-                </Text>
-
-                <InputField
-                    label="Username"
-                    value={username}
-                    onChangeText={setUsername}
-                    error={errors.username}
-                />
-
-                <InputField
-                    label="First Name"
-                    value={first_name}
-                    onChangeText={setFirstName}
-                />
-
-                <InputField
-                    label="Last Name"
-                    value={last_name}
-                    onChangeText={setLastName}
-                />
-
-                <InputField
-                    label="Email"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    value={email}
-                    onChangeText={setEmail}
-                    error={errors.email}
-                />
-
-                <InputField
-                    label="Password"
-                    secureTextEntry
-                    value={password}
-                    onChangeText={setPassword}
-                />
-
-                <InputField
-                    label="Confirm Password"
-                    secureTextEntry
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    error={errors.confirmPassword}
-                />
-
-                <TouchableOpacity
-                    style={[
-                        styles.dateButton,
-                        {
-                            backgroundColor: colors.input,
-                            borderColor: colors.border,
-                        },
-                    ]}
-                    onPress={() => setShowPicker(true)}
                 >
                     <Text
                         style={[
-                            styles.dateText,
+                            styles.title,
                             {
                                 color: colors.text,
                             },
                         ]}
                     >
-                        {date.toLocaleDateString()}
+                        Create Account
                     </Text>
-                </TouchableOpacity>
 
-                {errors.date_of_birth && (
-                    <Text style={styles.errorText}>
-                        {errors.date_of_birth}
-                    </Text>
-                )}
-
-                {showPicker && (
-                    <DateTimePicker
-                        value={date}
-                        mode="date"
-                        display="default"
-                        maximumDate={new Date()}
-                        onChange={(event, selectedDate) => {
-                            setShowPicker(false);
-
-                            if (selectedDate) {
-                                setDate(selectedDate);
-                            }
-                        }}
+                    <InputField
+                        label="Username"
+                        value={username}
+                        onChangeText={setUsername}
+                        error={errors.username}
                     />
-                )}
 
-                <TouchableOpacity
-                    style={[
-                        styles.registerButton,
-                        {
-                            backgroundColor: colors.primary,
-                        },
-                    ]}
-                    onPress={handleRegister}
-                >
-                    <Text style={styles.registerButtonText}>
-                        Register
-                    </Text>
-                </TouchableOpacity>
+                    <InputField
+                        label="First Name"
+                        value={first_name}
+                        onChangeText={setFirstName}
+                    />
 
-                <TouchableOpacity
-                    onPress={() =>
-                        navigation.navigate("Login")
-                    }
-                >
-                    <Text
+                    <InputField
+                        label="Last Name"
+                        value={last_name}
+                        onChangeText={setLastName}
+                    />
+
+                    <InputField
+                        label="Email"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        value={email}
+                        onChangeText={setEmail}
+                        error={errors.email}
+                    />
+
+                    <InputField
+                        label="Password"
+                        secureTextEntry
+                        value={password}
+                        onChangeText={setPassword}
+                    />
+
+                    <InputField
+                        label="Confirm Password"
+                        secureTextEntry
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        error={errors.confirmPassword}
+                    />
+
+                    <TouchableOpacity
                         style={[
-                            styles.loginLink,
+                            styles.dateButton,
                             {
-                                color: colors.primary,
+                                backgroundColor: colors.input,
+                                borderColor: colors.border,
                             },
                         ]}
+                        onPress={() => setShowPicker(true)}
                     >
-                        Already have an account? Login
-                    </Text>
-                </TouchableOpacity>
+                        <Text
+                            style={[
+                                styles.dateText,
+                                {
+                                    color: colors.text,
+                                },
+                            ]}
+                        >
+                            {date.toLocaleDateString()}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {errors.date_of_birth && (
+                        <Text style={styles.errorText}>
+                            {errors.date_of_birth}
+                        </Text>
+                    )}
+
+                    {showPicker && (
+                        <DateTimePicker
+                            value={date}
+                            mode="date"
+                            display="default"
+                            maximumDate={new Date()}
+                            onChange={(event, selectedDate) => {
+                                setShowPicker(false);
+
+                                if (selectedDate) {
+                                    setDate(selectedDate);
+                                }
+                            }}
+                        />
+                    )}
+
+                    <TouchableOpacity
+                        style={[
+                            styles.registerButton,
+                            {
+                                backgroundColor: colors.primary,
+                            },
+                        ]}
+                        onPress={handleRegister}
+                    >
+                        <Text style={styles.registerButtonText}>
+                            Register
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate("Login")
+                        }
+                    >
+                        <Text
+                            style={[
+                                styles.loginLink,
+                                {
+                                    color: colors.primary,
+                                },
+                            ]}
+                        >
+                            Already have an account? Login
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
+        </KeyboardAwareScrollView>
     );
 }
 

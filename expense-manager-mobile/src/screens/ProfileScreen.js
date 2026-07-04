@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
-    ScrollView,
     StyleSheet,
     ActivityIndicator,
     View,
     Alert,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { removeToken } from "../utils/storage";
-import { getProfile,updateProfile } from "../api/profile";
+import { getProfile, updateProfile } from "../api/profile";
 import { useTheme } from "../theme/ThemeProvider";
-import {useToast} from "../components/common/ToastProvider";
+import { useToast } from "../components/common/ToastProvider";
 import SettingsSection from "../components/profile/SettingsSection";
 import AccountSection from "../components/profile/AccountSection";
-
+import AboutSection from "../components/profile/AboutSection";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import ProfileForm from "../components/profile/ProfileForm";
 import SaveButton from "../components/profile/SaveButton";
@@ -26,7 +26,7 @@ export default function ProfileScreen() {
     const [editing, setEditing] = useState(false);
     const [currency, setCurrency] = useState("BDT");
     const [language] = useState("English");
-    const {showToast} = useToast();
+    const { showToast } = useToast();
     const navigation = useNavigation();
     const {
         isDark,
@@ -60,7 +60,7 @@ export default function ProfileScreen() {
 
         } catch (error) {
             console.log(error);
-            showToast("Unable to update profile.",'error');
+            showToast("Unable to update profile.", 'error');
 
         } finally {
             setSaving(false);
@@ -123,14 +123,18 @@ export default function ProfileScreen() {
     }
 
     return (
-        <ScrollView
+        <KeyboardAwareScrollView
             style={[
                 styles.container,
-            {
-                backgroundColor:colors.background,
-            },]}
+                {
+                    backgroundColor: colors.background,
+                },
+            ]}
             contentContainerStyle={styles.content}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            enableOnAndroid
+            extraScrollHeight={20}
         >
             <ProfileHeader profile={profile} setProfile={setProfile} />
             <ProfileForm
@@ -152,14 +156,15 @@ export default function ProfileScreen() {
                 onCurrencyPress={handleCurrencyPress}
                 onLanguagePress={handleLanguagePress}
             />
-
-            
+            <AboutSection
+                onPress={() => navigation.navigate("About")}
+            />
             <AccountSection
                 onChangePassword={handleChangePassword}
                 onLogout={handleLogout}
             />
-            
-        </ScrollView>
+
+        </KeyboardAwareScrollView>
     );
 }
 
@@ -175,4 +180,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
+
 });

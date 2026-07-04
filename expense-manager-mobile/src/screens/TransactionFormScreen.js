@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
     View,
-    ScrollView,
     TextInput,
     Text,
     TouchableOpacity,
     StyleSheet,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import Icon, { getCategoryIcon } from "../utils/categoryIcons"
 import { useTheme } from "../theme/ThemeProvider";
@@ -86,7 +86,7 @@ export default function TransactionFormScreen({ route, navigation }) {
             type,
             category: selectedCategory,
             description,
-            date: date.toLocaleDateString("en-CA") 
+            date: date.toLocaleDateString("en-CA")
         };
 
         try {
@@ -119,13 +119,18 @@ export default function TransactionFormScreen({ route, navigation }) {
     };
 
     return (
-        <ScrollView
+        <KeyboardAwareScrollView
             style={[
                 styles.container,
                 {
                     backgroundColor: colors.background,
                 },
             ]}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            enableOnAndroid
+            extraScrollHeight={20}
         >
 
             <Text
@@ -345,83 +350,83 @@ export default function TransactionFormScreen({ route, navigation }) {
                 </Text>
             </TouchableOpacity>
 
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 };
-    const styles = StyleSheet.create({
+const styles = StyleSheet.create({
 
-        container: {
-            flex: 1,
-            padding: 20,
-        },
+    container: {
+        flex: 1,
+        padding: 20,
+    },
 
-        title: {
-            fontSize: 22,
-            fontWeight: "bold",
-            marginBottom: 20,
-        },
+    title: {
+        fontSize: 22,
+        fontWeight: "bold",
+        marginBottom: 20,
+    },
 
-        label: {
-            fontSize: 15,
-            fontWeight: "600",
-            marginBottom: 10,
-        },
+    label: {
+        fontSize: 15,
+        fontWeight: "600",
+        marginBottom: 10,
+    },
 
-        input: {
-            padding: 14,
-            borderRadius: 12,
-            marginBottom: 12,
-            borderWidth: 1,
-        },
+    input: {
+        padding: 14,
+        borderRadius: 12,
+        marginBottom: 12,
+        borderWidth: 1,
+    },
 
-        button: {
-            padding: 15,
-            borderRadius: 12,
-            marginTop: 10,
-        },
+    button: {
+        padding: 15,
+        borderRadius: 12,
+        marginTop: 10,
+    },
 
-        buttonText: {
-            color: "#fff",
-            textAlign: "center",
-            fontWeight: "700",
-            fontSize: 16,
-        },
+    buttonText: {
+        color: "#fff",
+        textAlign: "center",
+        fontWeight: "700",
+        fontSize: 16,
+    },
 
-        categoryContainer: {
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 10,
-            marginBottom: 18,
-        },
+    categoryContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 10,
+        marginBottom: 18,
+    },
 
-        categoryItem: {
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            borderRadius: 24,
-            borderWidth: 1,
-        },
+    categoryItem: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 24,
+        borderWidth: 1,
+    },
 
-        typeContainer: {
-            flexDirection: "row",
-            gap: 10,
-            marginBottom: 18,
-        },
+    typeContainer: {
+        flexDirection: "row",
+        gap: 10,
+        marginBottom: 18,
+    },
 
-        typeButton: {
-            flex: 1,
-            padding: 14,
-            borderRadius: 12,
-            alignItems: "center",
-            borderWidth: 1,
-        },
+    typeButton: {
+        flex: 1,
+        padding: 14,
+        borderRadius: 12,
+        alignItems: "center",
+        borderWidth: 1,
+    },
 
-        categoryContent: {
-            flexDirection: "row",
-            alignItems: "center",
-        },
+    categoryContent: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
 
-        categoryText: {
-            marginLeft: 8,
-            fontWeight: "600",
-        },
-    });
+    categoryText: {
+        marginLeft: 8,
+        fontWeight: "600",
+    },
+});

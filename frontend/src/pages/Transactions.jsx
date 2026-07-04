@@ -80,12 +80,13 @@ function Transactions() {
   };
 
   return (
-    <div className="flex-1 bg-app-bg min-h-screen p-6 transition-colors duration-300">
+    <div className="flex-1 min-h-screen bg-app-bg p-4 sm:p-6 lg:p-8 transition-colors duration-300">
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
 
-        <div className="flex items-center gap-3 w-full max-w-3xl">
+        {/* Search + Filter */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:max-w-3xl">
 
           <input
             type="text"
@@ -98,17 +99,17 @@ function Transactions() {
             className="flex-1 p-3 rounded-xl border border-border bg-surface text-text-primary placeholder:text-text-secondary shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
 
             <button
               onClick={() => setShowFilter(!showFilter)}
-              className="bg-surface border border-border text-text-primary px-4 py-3 rounded-xl shadow hover:bg-surface-hover transition"
+              className="w-full sm:w-auto bg-surface border border-border text-text-primary px-4 py-3 rounded-xl shadow hover:bg-surface-hover transition"
             >
               Filter ▼
             </button>
 
             {showFilter && (
-              <div className="absolute right-0 mt-2 w-72 bg-surface border border-border rounded-xl shadow-xl p-5 z-50">
+              <div className="absolute right-0 sm:right-0 left-0 sm:left-auto mt-2 w-full sm:w-72 bg-surface border border-border rounded-xl shadow-xl p-5 z-50">
 
                 <h3 className="font-semibold text-text-primary mb-3">
                   Transaction Type
@@ -153,9 +154,10 @@ function Transactions() {
 
         </div>
 
+        {/* Add Transaction */}
         <button
           onClick={() => setShowModal(true)}
-          className="ml-4 bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-lg shadow transition"
+          className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-lg shadow transition"
         >
           + Add Transaction
         </button>
@@ -165,8 +167,8 @@ function Transactions() {
       {/* Transactions */}
       <TransactionList
         transactions={data?.results || []}
-        editable={true}
-        deletable={true}
+        editable
+        deletable
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
@@ -185,16 +187,15 @@ function Transactions() {
         onCancel={() => setDeleteTransaction(null)}
       />
 
-
       {/* Pagination */}
-      <div className="flex justify-center items-center gap-4 mt-6">
+      <div className="flex flex-wrap justify-center items-center gap-3 mt-6">
 
         <button
           disabled={!data.previous}
           onClick={() => setPage(page - 1)}
           className={`px-4 py-2 rounded-lg transition ${data.previous
-            ? "bg-primary hover:bg-primary-hover text-white"
-            : "bg-border text-text-secondary cursor-not-allowed"
+              ? "bg-primary hover:bg-primary-hover text-white"
+              : "bg-border text-text-secondary cursor-not-allowed"
             }`}
         >
           Previous
@@ -208,8 +209,8 @@ function Transactions() {
           disabled={!data.next}
           onClick={() => setPage(page + 1)}
           className={`px-4 py-2 rounded-lg transition ${data.next
-            ? "bg-primary hover:bg-primary-hover text-white"
-            : "bg-border text-text-secondary cursor-not-allowed"
+              ? "bg-primary hover:bg-primary-hover text-white"
+              : "bg-border text-text-secondary cursor-not-allowed"
             }`}
         >
           Next
@@ -217,13 +218,11 @@ function Transactions() {
 
       </div>
 
-      {/* ======================
-          ADD MODAL
-      ====================== */}
+      {/* Add Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
 
-          <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-surface border border-border rounded-xl shadow-xl p-5 sm:p-6">
 
             <TransactionForm
               mode="create"
@@ -232,16 +231,15 @@ function Transactions() {
             />
 
           </div>
+
         </div>
       )}
 
-      {/* ======================
-          EDIT MODAL
-      ====================== */}
+      {/* Edit Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
 
-          <div className="bg-surface border border-border rounded-xl shadow-xl w-full max-w-md p-6">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-surface border border-border rounded-xl shadow-xl p-5 sm:p-6">
 
             <TransactionForm
               mode="edit"
@@ -251,6 +249,7 @@ function Transactions() {
             />
 
           </div>
+
         </div>
       )}
 

@@ -11,14 +11,26 @@ function Navbar() {
     };
 
     return (
-
-        <div className="w-64 h-screen bg-surface border-r border-border text-text-primary p-5 flex flex-col">
-
-            <h1 className="text-2xl font-bold mb-10">
+        <div
+            className="
+            w-full
+            md:w-64
+            bg-surface
+            border-b md:border-b-0 md:border-r
+            border-border
+            text-text-primary
+            p-4 md:p-5
+            flex
+            flex-col
+            md:h-screen
+            transition-colors
+        "
+        >
+            <h1 className="text-xl md:text-2xl font-bold mb-5 md:mb-10 text-center md:text-left">
                 Expense Flow
             </h1>
 
-            <ul className="space-y-2">
+            <ul className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible whitespace-nowrap md:whitespace-normal">
 
                 {Object.entries(menu).map(([item, link]) => (
 
@@ -26,10 +38,9 @@ function Navbar() {
                         key={item}
                         to={link}
                         className={({ isActive }) =>
-                            `block rounded-xl px-4 py-3 transition-all duration-200 ${
-                                isActive
-                                    ? "bg-primary text-white shadow"
-                                    : "hover:bg-surface-hover"
+                            `flex-shrink-0 md:w-full rounded-xl px-4 py-3 transition-all duration-200 ${isActive
+                                ? "bg-primary text-white shadow"
+                                : "hover:bg-surface-hover"
                             }`
                         }
                     >
@@ -39,9 +50,7 @@ function Navbar() {
                 ))}
 
             </ul>
-
         </div>
-
     );
 
 }

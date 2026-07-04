@@ -19,12 +19,17 @@ async function request(endpoint, method = "GET", body = null) {
 
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
 
-    const data = await response.json();
-
     if (response.status === 401) {
         await removeToken();
         throw new Error("Unauthorized");
     }
+
+    // DELETE returns 204 No Content
+    if (response.status === 204) {
+        return null;
+    }
+
+    const data = await response.json();
 
     if (!response.ok) {
         throw data;

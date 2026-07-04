@@ -67,19 +67,19 @@ function Budget() {
 
     return (
         <>
-            <div className="min-h-screen bg-app-bg p-6 transition-colors duration-300">
+            <div className="min-h-screen bg-app-bg p-4 sm:p-6 lg:p-8 transition-colors duration-300">
 
                 {/* Header */}
 
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
 
                     <div>
 
-                        <h1 className="text-3xl font-bold text-text-primary">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
                             Budget Management
                         </h1>
 
-                        <p className="text-text-secondary mt-2">
+                        <p className="text-sm sm:text-base text-text-secondary mt-2">
                             Track your spending limits across different categories.
                         </p>
 
@@ -87,7 +87,7 @@ function Budget() {
 
                     <button
                         onClick={handleCreate}
-                        className="bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-xl shadow transition"
+                        className="w-full md:w-auto bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-xl shadow transition"
                     >
                         + Add Budget
                     </button>
@@ -98,7 +98,7 @@ function Budget() {
 
                 {limits.length === 0 ? (
 
-                    <div className="bg-surface border border-border rounded-2xl shadow p-10 text-center">
+                    <div className="bg-surface border border-border rounded-2xl shadow p-6 sm:p-10 text-center">
 
                         <h2 className="text-xl font-semibold text-text-primary">
                             No Budgets Found
@@ -110,7 +110,7 @@ function Budget() {
 
                         <button
                             onClick={handleCreate}
-                            className="mt-6 bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-xl transition"
+                            className="mt-6 w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-xl transition"
                         >
                             Create Your First Budget
                         </button>
@@ -119,7 +119,7 @@ function Budget() {
 
                 ) : (
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
 
                         {limits.map((item) => (
 
@@ -144,6 +144,7 @@ function Budget() {
                 onClose={() => setShowModal(false)}
                 onSuccess={handleSuccess}
             />
+
             <ConfirmModal
                 open={!!deleteBudget}
                 title="Delete Budget"

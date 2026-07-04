@@ -2,6 +2,7 @@ import TabNavigator from "./TabNavigator";
 import SplashScreen from "../screens/SplashScreen";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import AboutScreen from "../screens/AboutScreen";
 import TransactionFormScreen from "../screens/TransactionFormScreen";
 import AddEditBudgetLimitScreen from "../screens/AddEditBudgetLimitScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -19,12 +20,12 @@ export default function AppNavigator() {
 
             {/* MAIN APP */}
             <Stack.Screen name="Main" component={TabNavigator} />
-            <Stack.Screen name="TransactionForm" 
-            component={TransactionFormScreen}
-            options={{
-                presentation: 'modal',
-                headerShown:false,
-            }}
+            <Stack.Screen name="TransactionForm"
+                component={TransactionFormScreen}
+                options={{
+                    presentation: 'modal',
+                    headerShown: false,
+                }}
             />
             <Stack.Screen
                 name="AddEditBudgetLimit"
@@ -33,6 +34,10 @@ export default function AppNavigator() {
                     presentation: "modal",
                     headerShown: false,
                 }}
+            />
+            <Stack.Screen
+                name="About"
+                component={AboutScreen}
             />
 
         </Stack.Navigator>
