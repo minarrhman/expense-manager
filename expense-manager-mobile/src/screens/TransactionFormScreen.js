@@ -10,6 +10,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import Icon, { getCategoryIcon } from "../utils/categoryIcons"
+import { sendBudgetNotification } from "../utils/notifications"
 import { useTheme } from "../theme/ThemeProvider";
 import { useToast } from "../components/common/ToastProvider";
 
@@ -18,6 +19,7 @@ import {
     updateTransaction,
     getCategories,
 } from "../api/transactions";
+import { getCategoryLimits } from "../api/categoryLimit";
 
 export default function TransactionFormScreen({ route, navigation }) {
 
@@ -37,6 +39,23 @@ export default function TransactionFormScreen({ route, navigation }) {
 
 
 
+    const checkBudgetWarnings = (budgets) => {
+        budgets.results.forEach((budget) => {
+            
+            if (budget.status === "warning"){
+                sendBudgetNotification(
+                    "⚠️ Budget Warning",
+                    `${budget.category_name} is used ${budget.percentage_used}% used`
+                )
+            }
+            if (budget.warning === "exceeded"){
+                sendBudgetNotification(
+                    "🚨 Budget Limit Exceeded",
+                    `${budget.category_name} is exceeded by ${Math.abs(budget.remaining)}%`
+                )
+            }
+        });
+    }
     const filteredCategories = categories.filter(
         (cat) => cat.type === type
     );
@@ -94,10 +113,13 @@ export default function TransactionFormScreen({ route, navigation }) {
             if (isEdit) {
 
                 await updateTransaction(editingTransaction.id, payload);
-
+                const budgets = await getCategoryLimits();
+                checkBudgetWarnings(budgets);
             } else {
 
                 await createTransaction(payload);
+                const budgets = await getCategoryLimits();
+                checkBudgetWarnings(budgets);
 
             }
             showToast(

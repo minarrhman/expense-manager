@@ -114,7 +114,9 @@ export default function ProfileForm({
                         value={profile?.date_of_birth}
                         onChange={(date) => {
                             const formattedDate =
-                                new Date().toLocaleDateString("en-CA")
+                                date
+                                .toLocaleDateString("en-CA")
+                                .split("T")[0];
 
                             updateField(
                                 "date_of_birth",

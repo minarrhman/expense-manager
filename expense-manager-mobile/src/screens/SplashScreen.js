@@ -1,12 +1,15 @@
 import React, { useRef, useEffect } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 import { getToken } from "../utils/storage";
+import { requestNotificationPermission} from "../utils/notifications"
+
 
 export default function SplashScreen({ navigation }) {
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         let isMounted = true;
+        requestNotificationPermission();
 
         const startApp = async () => {
             try {
